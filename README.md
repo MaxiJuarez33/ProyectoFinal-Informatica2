@@ -9,7 +9,7 @@
 
 #### Comandos para subir updates locales al repo remoto
 
-- git add <Archivo o .> - Permite añadir los cambios hechos a la cola de subida del repo
+- git add <Archivo/carpeta o .> - Permite añadir los cambios hechos a la cola de subida del repo
 - git commit -m "TEXTO" - Añadir una breve descripcion sobre los cambio
 - git push origin <Rama> - Subir los archivos con commit a la rama de trabajo (para subir a otra rama cambiarse con checkout)
 
