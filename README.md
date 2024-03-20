@@ -7,7 +7,7 @@
 - git status - Para ver el estado de los archivos del repo
 - git fetch - Ver los ultimos cambios de la rama
 
-### Comandos para subir updates locales
+#### Comandos para subir updates locales al repo remoto
 
 - git add <Archivo o .> - Permite añadir los cambios hechos a la cola de subida del repo
 - git commit -m "TEXTO" - Añadir una breve descripcion sobre los cambio
