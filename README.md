@@ -23,3 +23,22 @@
 - Makefile - Archivo que trabaja con <make> y se encarga de automatizar un test o compilar y depurar el proeycto
 - .gitignore - Archivo para github que permite seleccionar que archivos o carpetas no subir
 - README.me - Es este archivo que se ve cuando abris el repo y donde esta lo mas frecuente
+
+# Uso de Issues en GitHub
+
+- Issues es una parte que permite hacer seguimiento de tareas, discutir ideas, opiniones, reportar bugs y ese tipo de cosas
+- Pueden ser hilos tan largo se quiera pero lo mejor seria cerrarlos cuando consideramos que hay una solucion
+- Cuando creen un Issue para lo que sea, traten de que sea dinamico y conciso, asi como algunos que ya deje yo ahi; y usenlo cada vez que encuentren un bug o algo sobre lo que tengan duda, 0 whatsapp
+- Cuando comenten un Issue, fijense de que al lado de compartir o publicar comentario (creo que solo si son quienes abrieron el issue pero lo comento igual), aparece que el comentario que van a poner es para cerrar el Issue, al no ser que eso quieran, selecciones la otra opcion que no lo cierra. Si lo cierran sin querer no pasa nada, se puede volver a abrir
+
+## Hacer pull request a main
+
+- El Pull Request es para poner en revision los cambios hechos en otra rama, si el cambio es aprobado, los cambios son incorporados a la rama de destino
+- Haber testeado todo usando los metodos planteados
+- Optimizar al maximo el codigo
+- Carpetas con nombres correctos segun lo acordado
+
+## Hacer pull request a pre-main
+
+- Hacer pull request a pre-main es para pedir que otro lo testee u optimice el codigo
+- Carpetas con nombres correctos segun lo acordado
