@@ -31,6 +31,11 @@
 - Cuando creen un Issue para lo que sea, traten de que sea dinamico y conciso, asi como algunos que ya deje yo ahi; y usenlo cada vez que encuentren un bug o algo sobre lo que tengan duda, 0 whatsapp
 - Cuando comenten un Issue, fijense de que al lado de compartir o publicar comentario (creo que solo si son quienes abrieron el issue pero lo comento igual), aparece que el comentario que van a poner es para cerrar el Issue, al no ser que eso quieran, selecciones la otra opcion que no lo cierra. Si lo cierran sin querer no pasa nada, se puede volver a abrir
 
+### Projects
+
+- Para hacer un mejor seguimiento vamos a usar los projects que esten linkeados a los issues
+- Cuando terminen una tarea asignada, sea individual o grupal, si está terminada cambien el estado de la misma
+
 ## Hacer pull request a main
 
 - El Pull Request es para poner en revision los cambios hechos en otra rama, si el cambio es aprobado, los cambios son incorporados a la rama de destino
