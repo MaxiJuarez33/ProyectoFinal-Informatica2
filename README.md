@@ -35,6 +35,7 @@
 
 - Para hacer un mejor seguimiento vamos a usar los projects que esten linkeados a los issues
 - Cuando terminen una tarea asignada, sea individual o grupal, si está terminada cambien el estado de la misma
+- Si quieren crear una nueva tarea, solicitenlo usando issues y @owner
 
 ## Hacer pull request a main
 
