@@ -1,4 +1,4 @@
-# Comandos de git
+# Comandos frecuenetes de git
 
 - git pull - Actualiza la version del programa en nuestro pc segun ultimo commit
 - git branch - Crear rama de trabajo
@@ -6,12 +6,22 @@
 - git checkout <Nombre de la rama> - Permite cambiar de rama
 - git status - Para ver el estado de los archivos del repo
 - git fetch - Ver los ultimos cambios de la rama
-
-#### Comandos para subir updates locales al repo remoto
-
 - git add <Archivo/carpeta o .> - Permite añadir los cambios hechos a la cola de subida del repo
 - git commit -m "TEXTO" - Añadir una breve descripcion sobre los cambio
 - git push origin <Rama> - Subir los archivos con commit a la rama de trabajo (para subir a otra rama cambiarse con checkout)
+
+## Comandos para trabajar
+
+#### Revisar si hay updates
+
+- git fetch
+- git pull (si hay cambios dados por fetch)
+
+#### Subir nuevas updates
+
+- git add <Archivo/carpeta o .> (los <> no van en el comando)
+- git commit -m "mensage breve sobre la update"
+- git push origin <nombre-de-la-rama>
 
 ## Carpetas y archivos
 
@@ -21,7 +31,7 @@
 - obj - Archivos de pre-creacion de ejecutables, no tocar esta carpeta
 - src - Archivos de codigo fuente
 - Makefile - Archivo que trabaja con <make> y se encarga de automatizar un test o compilar y depurar el proeycto
-- .gitignore - Archivo para github que permite seleccionar que archivos o carpetas no subir
+- .gitignore - Archivo para git que permite seleccionar que archivos o carpetas no subir
 - README.me - Es este archivo que se ve cuando abris el repo y donde esta lo mas frecuente
 
 # Uso de Issues en GitHub
@@ -41,6 +51,9 @@
 ## Hacer pull request a main
 
 - El Pull Request es para poner en revision los cambios hechos en otra rama, si el cambio es aprobado, los cambios son incorporados a la rama de destino
+
+#### Revisar antes de hacer pullrequest a main
+
 - Haber testeado todo usando los metodos planteados
 - Optimizar al maximo el codigo
 - Carpetas con nombres correctos segun lo acordado
@@ -48,4 +61,7 @@
 ## Hacer pull request a pre-main
 
 - Hacer pull request a pre-main es para pedir que otro lo testee u optimice el codigo
+
+#### Unico requisito
+
 - Carpetas con nombres correctos segun lo acordado
