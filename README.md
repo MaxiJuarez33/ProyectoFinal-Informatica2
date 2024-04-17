@@ -1,4 +1,4 @@
-# Comandos frecuenetes de git
+# Comandos frecuentes de git
 
 - git pull - Actualiza la version del programa en nuestro pc segun ultimo commit
 - git branch - Crear rama de trabajo
