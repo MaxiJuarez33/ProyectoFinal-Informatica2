@@ -1,34 +1,37 @@
-#include "emtr.h" // inclusion de la cabecera 
+#include "emtr.h" // inclusion de la cabecera
 
+// El analog:: designa la clase con la que se trabajata
 
-    // El analog:: designa la clase con la que se trabajata
+analog::analog(uint16_t analogpin)
+{ // Esta funcion tomara el pin que se ingrese y guardarlo en el atributo
 
-analog::analog(uint16_t analogpin){  // Esta funcion tomara el pin que se ingrese y guardarlo en el atributo
-
-    this->analogpin = analogpin;    // el this--> sirve para establecer la primera variable como el atributo del objeto
+    this->analogpin = analogpin; // el this--> sirve para establecer la primera variable como el atributo del objeto
 }
 
-analog::~analog(){
+analog::~analog()
+{
 }
 
-void analog::recep(uint16_t analogpin){ // defino el metodo en el cual trabajara nuestra funcion
-    pinMode (analogpin, INPUT);
+void analog::recep(uint16_t analogpin)
+{ // defino el metodo en el cual trabajara nuestra funcion
+    pinMode(analogpin, INPUT);
     float analogval = analogRead(analogpin);
     Serial.println(analogval);
 }
 
-digital::digital(uint8_t digitalpin){
+digital::digital(uint8_t digitalpin)
+{
 
-    this->digitalpin = digitalpin;   
+    this->digitalpin = digitalpin;
 }
 
-digital::~digital(){
+digital::~digital()
+{
 }
 
-void digital::emitir(uint8_t divitalpin, uint8_t digitalval){
-    
-    pinMode (digitalpin, OUTPUT);
-    digitalWrite(digitalpin,digitalval);
+void digital::emitir(uint8_t divitalpin, uint8_t digitalval)
+{
+
+    pinMode(digitalpin, OUTPUT);
+    digitalWrite(digitalpin, digitalval);
 }
-
-
