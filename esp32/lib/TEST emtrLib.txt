@@ -8,7 +8,7 @@ TEST COMPLETADO | FUNCIONA PERFECTO
 - No es necesario destruir las clases en este caso
 - Cambiar nombres
 - Redactar comentarios mas concretos, especificos y tecnicos
-- Analizar la posibilidad de usar una sola clase con 4 metodos
+- Analizar y probar la posibilidad de usar una sola clase con 4 metodos
 - Documentacion no redactada debidamente
 - Usar solo uint8_t
 - Analizar si conviene hacer la libreria de modo inOut
