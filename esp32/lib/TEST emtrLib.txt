@@ -1,0 +1,14 @@
+TEST emtrLib
+
+TEST COMPLETADO | FUNCIONA PERFECTO
+
+----------------- OBSERVACION DE OPTIMIZACION
+
+- Si se deja la declaracion del pin al declarar el objeto, usar el pin ya guardado, no pedir otra vez
+- No es necesario destruir las clases en este caso
+- Cambiar nombres
+- Redactar comentarios mas concretos, especificos y tecnicos
+- Analizar la posibilidad de usar una sola clase con 4 metodos
+- Documentacion no redactada debidamente
+- Usar solo uint8_t
+- Analizar si conviene hacer la libreria de modo inOut

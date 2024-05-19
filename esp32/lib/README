@@ -1,2 +1,0 @@
-
-Para la emision y recepcion de datos se creara una nueva libreria "emtr.h". En esta se crean dos objetos, uno para la recepcion de los valores analogicos y otro para la emision de valores digitales. El primer objeto esta destinado a la recepcion de los valores leidos por los sensores. Y el segundo objeto esta destinado al envio de "ALTO" y "BAJO" para los activadores. Cada uno de los objetos tiene declarada publicamente las funciones que permitiran el funcionamiento correspondiente para la emision y transmision de datos. 
