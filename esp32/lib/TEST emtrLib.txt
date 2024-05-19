@@ -12,3 +12,4 @@ TEST COMPLETADO | FUNCIONA PERFECTO
 - Documentacion no redactada debidamente
 - Usar solo uint8_t
 - Analizar si conviene hacer la libreria de modo inOut
+- Cambiar nombre a pinControl
