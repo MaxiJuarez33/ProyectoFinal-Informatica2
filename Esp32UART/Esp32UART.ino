@@ -1,16 +1,17 @@
-#include <HardwareSerial.h>
+#include <HardwareSerial.h> // Incluye la librería para comunicación serie por hardware
 
-#define sensInt 15
-#define sensExt 2
-#define sensHum 4
+#define sensInt 15 // Pin para el sensor de temperatura interior
+#define sensExt 2 // Pin para el sensor de temperatura exterior
+#define sensHum 4 // Pin para el sensor de humedad general
 
-// Definimos el objeto serial
+// Definimos el objeto serial para UART0
 HardwareSerial mySerial(0); // UART0
 
+// Estructura para almacenar los datos de temperatura y humedad
 struct TempData {
-  int tempInt;
-  int tempExt;
-  int humGen;
+  int tempInt; // Temperatura interior
+  int tempExt; // Temperatura exterior
+  int humGen;  // Humedad general
 };
 
 void setup() {
@@ -19,36 +20,36 @@ void setup() {
   mySerial.begin(9600); // UART0 para comunicación con la PC
 
   // Inicializamos pines de sensores y actuadores
-  pinMode(sensInt, INPUT); // Pin del sensor (ajusta según tu configuración)
-  pinMode(sensExt, INPUT);
-  pinMode(sensHum, INPUT);
-  pinMode(5, OUTPUT); // Pin del actuador (ajusta según tu configuración)
+  pinMode(sensInt, INPUT); // Pin del sensor de temperatura interior
+  pinMode(sensExt, INPUT); // Pin del sensor de temperatura exterior
+  pinMode(sensHum, INPUT); // Pin del sensor de humedad general
+  pinMode(5, OUTPUT); // Pin del actuador
 }
 
 void loop() {
   // Leer datos de sensores
   TempData tempData;
-  tempData.tempInt = analogRead(sensInt); // Ejemplo de lectura de sensor
-  tempData.tempExt = analogRead(sensExt);
-  tempData.humGen = analogRead(sensHum);
+  tempData.tempInt = analogRead(sensInt); // Lectura del sensor de temperatura interior
+  tempData.tempExt = analogRead(sensExt); // Lectura del sensor de temperatura exterior
+  tempData.humGen = analogRead(sensHum); // Lectura del sensor de humedad general
 
   // Enviar datos de sensor a través del UART
-  mySerial.write((uint8_t*)&tempData, sizeof(tempData));
+  mySerial.write((uint8_t*)&tempData, sizeof(tempData)); // Enviar estructura de datos
 
   // Revisar si hay datos recibidos en el UART
   if (mySerial.available()) {
-    String command = mySerial.readStringUntil('\n');
+    String command = mySerial.readStringUntil('\n'); // Leer el comando recibido hasta el carácter de nueva línea
 
     // Procesar comando recibido
     if (command == "ACTUATOR_ON") {
       // Activar actuador
-      digitalWrite(5, HIGH);
+      digitalWrite(5, HIGH); // Encender el actuador
     } else if (command == "ACTUATOR_OFF") {
       // Desactivar actuador
-      digitalWrite(5, LOW);
+      digitalWrite(5, LOW); // Apagar el actuador
     }
   }
 
   // Pequeña demora para no saturar el puerto serie
-  delay(100);
+  delay(100); // Esperar 100 ms
 }
