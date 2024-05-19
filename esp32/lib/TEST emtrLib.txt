@@ -13,3 +13,4 @@ TEST COMPLETADO | FUNCIONA PERFECTO
 - Usar solo uint8_t
 - Analizar si conviene hacer la libreria de modo inOut
 - Cambiar nombre a pinControl
+- Si se usa una sola clase, analizar metodo para obtener la cantidad de sensores y actuadores (pensado para la interfaz grafica)
