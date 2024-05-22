@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "emtr.h"
+#include "pinControl.h"
 
 #define sensInt 15 // definicion de los pines
 #define sensExt 2
@@ -20,11 +20,11 @@ void setup()
 
 void loop()
 {
-  tempInt.recep(sensInt); // funcion declarada previamente junto con su atributo
-  tempExt.recep(sensExt);
-  humGen.recep(sensHum);
+  tempInt.recep(); // funcion declarada previamente junto con su atributo
+  tempExt.recep();
+  humGen.recep();
 
-  ledOut.emitir(actLed, digitalState);
+  ledOut.emitir(digitalState);
 
   delay(2000);
 }
