@@ -8,12 +8,12 @@ analog::analog(uint8_t analogpin)
     this->analogpin = analogpin; // el this--> sirve para establecer la primera variable como el atributo del objeto
 }
 
-
-void analog::recep()
+double analog::recep()
 { // defino el metodo en el cual trabajara nuestra funcion
     pinMode(analogpin, INPUT);
     float analogval = analogRead(analogpin);
     Serial.println(analogval);
+    return analogval;
 }
 
 digital::digital(uint8_t digitalpin)
@@ -21,7 +21,6 @@ digital::digital(uint8_t digitalpin)
 
     this->digitalpin = digitalpin;
 }
-
 
 void digital::emitir(uint8_t digitalval)
 {

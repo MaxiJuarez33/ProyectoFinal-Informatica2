@@ -1,3 +1,4 @@
+```
 #include <Arduino.h>
 #include "pinControl.h"
 
@@ -23,3 +24,4 @@ void loop()
 
   delay(2000);
 }
+```
