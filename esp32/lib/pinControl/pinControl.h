@@ -1,37 +1,28 @@
-#include "pinControl.h" // inclusion de la cabecera
+#ifndef _PINCONTROLH_
+#define _PINCONTROLH_
 
-// El analog:: designa la clase con la que se trabajata
+#include <arduino.h>
 
-analog::analog(uint16_t analogpin)
-{ // Esta funcion tomara el pin que se ingrese y guardarlo en el atributo
-
-    this->analogpin = analogpin; // el this--> sirve para establecer la primera variable como el atributo del objeto
-}
-
-analog::~analog()
+class analog // se crea el objeto
 {
-}
+private:                // se crean atributos no modificables por el usuario, solo se utilizan dentro del objeto
+    uint8_t analogpin; // pines de los sensores
+public:
+    analog(uint8_t analogpin); // funcion constructor, sirve para inicializar el objeto y establecer sus valores
 
-void analog::recep(uint16_t analogpin)
-{ // defino el metodo en el cual trabajara nuestra funcion
-    pinMode(analogpin, INPUT);
-    float analogval = analogRead(analogpin);
-    Serial.println(analogval);
-}
+    void recep(); // definicion de la funcion que se utilizara, se le debe agregar los atributos entre parentesis
+};
 
-digital::digital(uint8_t digitalpin)
+
+class digital
 {
+private:
+    uint8_t digitalpin;
 
-    this->digitalpin = digitalpin;
-}
+public:
+    digital(uint8_t digitalpin);
 
-digital::~digital()
-{
-}
+    void emitir(uint8_t digitalval);
+};
 
-void digital::emitir(uint8_t divitalpin, uint8_t digitalval)
-{
-
-    pinMode(digitalpin, OUTPUT);
-    digitalWrite(digitalpin, digitalval);
-}
+#endif

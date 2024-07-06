@@ -1,15 +1,10 @@
 #include <Arduino.h>
 #include "pinControl.h"
 
-#define sensInt 15 // definicion de los pines
-#define sensExt 2
-#define sensHum 4
-#define actLed 5
-
-analog tempInt(sensInt); // se nombra al objeto que se utilizara en el class y se le ingresa el atributo
-analog tempExt(sensExt);
-analog humGen(sensHum);
-digital ledOut(actLed);
+analog tempInt(15); // se nombra al objeto que se utilizara en el class y se le ingresa el atributo
+analog tempExt(2);
+analog humGen(4);
+digital ledOut(2);
 
 int digitalState;
 
