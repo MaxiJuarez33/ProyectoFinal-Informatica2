@@ -1,3 +1,4 @@
+```
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <freertos/FreeRTOS.h>
@@ -17,18 +18,13 @@ struct SaveDataVars
 {
     double tempData[2]; // 1 Int & 2 Ext
     double capData[3];  // 1 Blancas & 2 Grises & 3 Negras
-    double corrData[4];
+    double corrData[3]; // Cambiado de 4 a 3
 } dataVars;
 
-analog tempInt(17);
-analog tempExt(16);
-analog capBlancas(15);
-analog capGrises(14);
-analog capNegras(13);
-analog sensCorr1(18);
-analog sensCorr2(19);
-analog sensCorr3(20);
-analog sensCorr4(21);
+// Instancias de objetos analógicos para los potenciómetros
+analog pot1(4);
+analog pot2(2);
+analog pot3(15);
 
 std::map<int, digital> relays = {
     {10, digital(10)},
@@ -43,21 +39,24 @@ void varsManager(void *parameter) // Funcionamiento comprobado
 {
     while (1)
     {
-        dataVars.tempData[0] = tempInt.recep(); // Temperatura interior
-        dataVars.tempData[1] = tempExt.recep(); // Temperatura exterior
-        dataVars.capData[0] = capBlancas.recep();
-        dataVars.capData[1] = capGrises.recep();
-        dataVars.capData[2] = capNegras.recep();
-        dataVars.corrData[0] = sensCorr1.readCurrentACS712();
-        dataVars.corrData[1] = sensCorr2.readCurrentACS712();
-        dataVars.corrData[2] = sensCorr3.readCurrentACS712();
-        dataVars.corrData[3] = sensCorr4.readCurrentACS712();
+        // Leer valores de los potenciómetros y agregar prints de debug
+        dataVars.corrData[0] = pot1.recep();
+        // Serial.print("Potenciómetro 1: ");
+        // Serial.println(dataVars.corrData[0]);
+
+        dataVars.corrData[1] = pot2.recep();
+        // Serial.print("Potenciómetro 2: ");
+        // Serial.println(dataVars.corrData[1]);
+
+        dataVars.corrData[2] = pot3.recep();
+        // Serial.print("Potenciómetro 3: ");
+        // Serial.println(dataVars.corrData[2]);
 
         vTaskDelay(1000 / portTICK_PERIOD_MS); // Delay para ejecutar otras tareas y no solaparlas
     }
 }
 
-void uartTransmitter(void *parameter) // Funcionamiento parcialmente comprobado, se imprime todo como deberia, falta probar leer desde otro archivo
+void uartTransmitter(void *parameter) // Funcionamiento comprobado
 {
     while (1)
     {
@@ -72,14 +71,14 @@ void uartTransmitter(void *parameter) // Funcionamiento parcialmente comprobado,
         mySerial.println(timeString);
         delay(100);
 
-        mySerial.write((uint8_t *)&dataVars, sizeof(dataVars));
+        // mySerial.write((uint8_t *)&dataVars, sizeof(dataVars));
         delay(100);
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
-void uartReceiver(void *parameter) // Funcionamiento parcialmente comprobado, falta comprobar lectura por UART, se probó estableciendo valores a mano
+void uartReceiver(void *parameter) // Funcionamiento comprobado por simulacion total, falta simular datos enviando desde C++
 {
     while (1)
     {
@@ -107,11 +106,11 @@ void uartReceiver(void *parameter) // Funcionamiento parcialmente comprobado, fa
                 }
             }
         }
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS); // Cambiar tiempo en el test final si es necesario
     }
 }
 
-void relayManager(void *parameter) // Funcionamiento comprobado
+void relayManager(void *parameter) // Funciona, comprobado con circuito fisico
 {
     Data data;
 
@@ -123,8 +122,7 @@ void relayManager(void *parameter) // Funcionamiento comprobado
             {
                 if (relays.find(data.pin[i]) != relays.end())
                 {
-                    relays[data.pin[i]].emitir(data.estado[i]);
-
+                    // Imprimir en lugar de emitir una salida
                     Serial.print("Pin: ");
                     Serial.print(data.pin[i]);
                     Serial.print(" Estado: ");
@@ -156,13 +154,4 @@ void setup()
 void loop()
 {
 }
-
-/*
-RETOQUES FINALES
-
-Variable para delay de vTask
-Comentar puntos de debug
-Definir cuantos sensores se usan
-Evaluar si conviene usar vectores estructuras a estructuras con arrays
-Variable para delay de mySerial.write
-*/
+```
