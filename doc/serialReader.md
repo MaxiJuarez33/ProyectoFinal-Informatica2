@@ -1,3 +1,6 @@
+CREADO, OPTIMIZADO y TESTEADO POR MAXI
+23/7 | Al final del archivo se documentan los cambios futuros de esta fecha
+
 ### CODIGO MINIMO
 
 ```
