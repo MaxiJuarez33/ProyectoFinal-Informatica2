@@ -79,7 +79,7 @@ void uartTransmitter(void *parameter) // Funcionamiento parcialmente comprobado,
     }
 }
 
-void uartReceiver(void *parameter) // Funcionamiento parcialmente comprobado, falta comprobar lectura por UART, se probó estableciendo valores a mano
+void uartReceiver(void *parameter) // AVERIGUAR FORMA DE HACERLO SIN PREDECLARAR LOS PINES
 {
     while (1)
     {
