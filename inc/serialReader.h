@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 #include <string>
+#include <sstream>
 
 struct SaveDataVars
 {
@@ -23,8 +24,8 @@ public:
     void configurePort();
     void readFromPort();
     void startReading();
-    void setDigitalLow(const int *relayPin);
-    void setDigitalHigh(const int *relayPin);
+    void setDigitalLow(const char *relayPin);
+    void setDigitalHigh(const char *relayPin);
 
 private:
     const char *portName;
@@ -32,6 +33,8 @@ private:
     DCB dcbSerialParams;
     COMMTIMEOUTS timeouts;
     bool isPortOpen;
+    SaveDataVars previousData;
+    bool isFirstRead = true;
 };
 
 #endif

@@ -71,10 +71,11 @@ void SerialReader::configurePort()
         return;
     }
 
-    std::cout << "Tiempos de espera aplicados" << std::endl;
+    std::cout << "Tiempos de espera aplicados\n"
+              << std::endl;
 }
 
-void SerialReader::readFromPort()
+void SerialReader::readFromPort() // FUNCIONAMIENTO COMPROBADO
 {
     SaveDataVars data;
     DWORD bytesRead;
@@ -83,16 +84,22 @@ void SerialReader::readFromPort()
     {
         if (ReadFile(hSerial, &data, sizeof(data), &bytesRead, NULL) && bytesRead == sizeof(data))
         {
-            std::cout << "\rTemp Int: " << data.tempData[0]
-                      << " | Temp Ext: " << data.tempData[1]
-                      << " | Cap Blancas: " << data.capData[0]
-                      << " | Cap Grises: " << data.capData[1]
-                      << " | Cap Negras: " << data.capData[2]
-                      << " | Corriente 1: " << data.corrData[0]
-                      << " | Corriente 2: " << data.corrData[1]
-                      << " | Corriente 3: " << data.corrData[2]
-                      << " | Corriente 4: " << data.corrData[3]
-                      << std::flush;
+            if (isFirstRead || memcmp(&data, &previousData, sizeof(SaveDataVars)) != 0)
+            {
+                std::cout << "\rTemp Int: " << data.tempData[0]
+                          << " | Temp Ext: " << data.tempData[1]
+                          << " | Cap Blancas: " << data.capData[0]
+                          << " | Cap Grises: " << data.capData[1]
+                          << " | Cap Negras: " << data.capData[2]
+                          << " | Corriente 1: " << data.corrData[0]
+                          << " | Corriente 2: " << data.corrData[1]
+                          << " | Corriente 3: " << data.corrData[2]
+                          << " | Corriente 4: " << data.corrData[3]
+                          << std::flush;
+
+                previousData = data;
+                isFirstRead = false;
+            }
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
@@ -104,34 +111,22 @@ void SerialReader::startReading()
     reader.join();
 }
 
-void SerialReader::setDigitalLow(const int *relayPin)
+void SerialReader::setDigitalLow(const char *relayPin)
 {
-    DWORD bytesWritten;  // Numeros de bytes escritos
-    std::string command; // String a enviar
+    DWORD bytesWritten;
+    std::string command = std::to_string(*relayPin) + ",0\n";
 
-    while (true) // SE ENVIA ASI, %d,%d (pin,estado)
-    {
-        command.append(std::to_string(*relayPin));
-        command = ",0";
+    WriteFile(hSerial, command.c_str(), command.size(), &bytesWritten, NULL);
 
-        WriteFile(hSerial, command.c_str(), command.size(), &bytesWritten, NULL); // Enviar
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Espera para no saturar
-    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
-void SerialReader::setDigitalHigh(const int *relayPin)
+void SerialReader::setDigitalHigh(const char *relayPin)
 {
-    DWORD bytesWritten;  // Numeros de bytes escritos
-    std::string command; // String a enviar
+    DWORD bytesWritten;
+    std::string command = std::to_string(*relayPin) + ",1\n";
 
-    while (true) // SE ENVIA ASI, %d,%d (pin,estado)
-    {
-        command.append(std::to_string(*relayPin));
-        command = ",1";
+    WriteFile(hSerial, command.c_str(), command.size(), &bytesWritten, NULL);
 
-        WriteFile(hSerial, command.c_str(), command.size(), &bytesWritten, NULL); // Enviar
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Espera para no saturar
-    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }

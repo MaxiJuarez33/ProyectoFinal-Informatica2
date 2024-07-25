@@ -20,21 +20,21 @@ struct SaveDataVars
     double corrData[4];
 } dataVars;
 
-analog tempInt(17);
-analog tempExt(16);
-analog capBlancas(15);
-analog capGrises(14);
-analog capNegras(13);
-analog sensCorr1(18);
-analog sensCorr2(19);
-analog sensCorr3(20);
-analog sensCorr4(21);
+analog tempInt(36);
+analog tempExt(39);
+analog capBlancas(34);
+analog capGrises(35);
+analog capNegras(32);
+analog sensCorr1(33);
+analog sensCorr2(25);
+analog sensCorr3(26);
+analog sensCorr4(27);
 
 std::map<int, digital> relays = {
-    {5, digital(5)},
-    {9, digital(9)},
-    {8, digital(8)},
-    {7, digital(7)}};
+    {2, digital(2)},
+    {19, digital(19)},
+    {18, digital(18)},
+    {5, digital(5)}};
 
 HardwareSerial mySerial(0);
 QueueHandle_t uartQueue;
@@ -69,7 +69,7 @@ void uartTransmitter(void *parameter) // Funcionamiento comprobado
         char timeString[10];
         strftime(timeString, sizeof(timeString), "%H:%M:%S", &timeinfo);
 
-        mySerial.println(timeString);
+        // mySerial.println(timeString); // No se lee desde el otro lado e irrumpe el formato de los datos
         delay(100);
 
         mySerial.write((uint8_t *)&dataVars, sizeof(dataVars));
@@ -113,7 +113,7 @@ void uartReceiver(void *parameter)
     }
 }
 
-void relayManager(void *parameter) // Funcionamiento comprobado
+void relayManager(void *parameter) // Funcionamiento comprobado con hardcode
 {
     Data data;
 

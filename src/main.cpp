@@ -1,7 +1,7 @@
 #include "serialReader.h"
 #include <iostream>
 
-int pin = 12;
+char pin = 2;
 
 int main()
 {
@@ -15,7 +15,10 @@ int main()
     }
 
     serialReader.configurePort();
-    serialReader.startReading();
+
+    // Usar un thread separado para leer, así la comunicación no se bloquea
+    std::thread reader(&SerialReader::startReading, &serialReader);
+    reader.detach();
 
     serialReader.setDigitalHigh(&pin);
     Sleep(3000);

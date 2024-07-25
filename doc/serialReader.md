@@ -60,7 +60,18 @@ setDigitalLow(pinDigital);
 por dentro, se concatena el pin como string (despues se pasa a int en arduino) y tambien se le agrega el estado
 Lo que se transmite/recibe el arduino es "pin,estado"
 
-# PLANTEAMIENTO DE CAMBIOS 23/7
+### TESTEO
+
+Usando el ESP32, y hardcode en algunas partes, se realizaron las siguientes pruebas
+
+- Apertura de UART (FUNCIONA)
+- Cierre de UART (FUNCIONA)
+- Configuracion de UART (FUNCIONA)
+- Configuracion de tiempos de espera (FUNCIONA)
+- Lectura de puerto serie (FUNCIONA)
+- Enviar señales al esp32 por uart (NO COMPROBADO)
+
+### PLANTEAMIENTO DE CAMBIOS 23/7
 
 - Una vez terminado los algoritmos, determinar si conviene dejar la escructura con los datos o si se declaran variables globales individuales (esto en caso de hacer los algoritmos de electricidad y tanques como librerias)
 
