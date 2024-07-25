@@ -31,7 +31,7 @@ analog sensCorr3(20);
 analog sensCorr4(21);
 
 std::map<int, digital> relays = {
-    {10, digital(10)},
+    {5, digital(5)},
     {9, digital(9)},
     {8, digital(8)},
     {7, digital(7)}};
@@ -57,7 +57,7 @@ void varsManager(void *parameter) // Funcionamiento comprobado
     }
 }
 
-void uartTransmitter(void *parameter) // Funcionamiento parcialmente comprobado, se imprime todo como deberia, falta probar leer desde otro archivo
+void uartTransmitter(void *parameter) // Funcionamiento comprobado
 {
     while (1)
     {
@@ -79,7 +79,7 @@ void uartTransmitter(void *parameter) // Funcionamiento parcialmente comprobado,
     }
 }
 
-void uartReceiver(void *parameter) // AVERIGUAR FORMA DE HACERLO SIN PREDECLARAR LOS PINES
+void uartReceiver(void *parameter)
 {
     while (1)
     {
@@ -94,8 +94,10 @@ void uartReceiver(void *parameter) // AVERIGUAR FORMA DE HACERLO SIN PREDECLARAR
 
                 Data data;
 
-                if (sscanf(buffer, "%d,%d;%d,%d", &data.pin[0], &data.estado[0], &data.pin[1], &data.estado[1]) == 4)
+                // Suponemos que la cadena es del tipo "pin,estado\n"
+                if (sscanf(buffer, "%d,%d", &data.pin[0], &data.estado[0]) == 2)
                 {
+                    // Enviamos los datos a la cola
                     if (xQueueSend(uartQueue, &data, portMAX_DELAY) != pdPASS)
                     {
                         Serial.println("Error al enviar a la cola");

@@ -109,10 +109,10 @@ void SerialReader::setDigitalLow(const int *relayPin)
     DWORD bytesWritten;  // Numeros de bytes escritos
     std::string command; // String a enviar
 
-    while (true) // SE ENVIA ASI, %d,ESTADO
+    while (true) // SE ENVIA ASI, %d,%d (pin,estado)
     {
-        command.append(std::to_string(relayPin));
-        command = ",LOW";
+        command.append(std::to_string(*relayPin));
+        command = ",0";
 
         WriteFile(hSerial, command.c_str(), command.size(), &bytesWritten, NULL); // Enviar
 
@@ -125,10 +125,10 @@ void SerialReader::setDigitalHigh(const int *relayPin)
     DWORD bytesWritten;  // Numeros de bytes escritos
     std::string command; // String a enviar
 
-    while (true) // SE ENVIA ASI, %d,ESTADO
+    while (true) // SE ENVIA ASI, %d,%d (pin,estado)
     {
-        command.append(std::to_string(relayPin));
-        command = ",HIGH";
+        command.append(std::to_string(*relayPin));
+        command = ",1";
 
         WriteFile(hSerial, command.c_str(), command.size(), &bytesWritten, NULL); // Enviar
 
