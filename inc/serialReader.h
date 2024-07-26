@@ -13,6 +13,7 @@ struct SaveDataVars
     double tempData[2]; // 1 Int & 2 Ext
     double capData[3];  // 1 Blancas & 2 Grises & 3 Negras
     double corrData[4];
+    char timeString[10];
 };
 
 class SerialReader

@@ -19,7 +19,10 @@ double analog::readCurrentACS712()
     return current;
 }
 
-digital::digital(uint8_t pin) : digitalpin(pin) {}
+digital::digital(uint8_t pin) : digitalpin(pin)
+{
+    pinMode(digitalpin, OUTPUT);
+}
 
 void digital::emitir(uint8_t digitalval)
 {

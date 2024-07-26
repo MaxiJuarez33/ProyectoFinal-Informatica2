@@ -7,17 +7,15 @@
 #include <map>
 #include "pinControl.h"
 
-struct Data
-{
-    int pin[4];
-    int estado[4];
-};
+#define delayValue 100
+#define taskDelayValue 1000
 
 struct SaveDataVars
 {
     double tempData[2]; // 1 Int & 2 Ext
     double capData[3];  // 1 Blancas & 2 Grises & 3 Negras
     double corrData[4];
+    char timeString[10];
 } dataVars;
 
 analog tempInt(36);
@@ -29,12 +27,6 @@ analog sensCorr1(33);
 analog sensCorr2(25);
 analog sensCorr3(26);
 analog sensCorr4(27);
-
-std::map<int, digital> relays = {
-    {2, digital(2)},
-    {19, digital(19)},
-    {18, digital(18)},
-    {5, digital(5)}};
 
 HardwareSerial mySerial(0);
 QueueHandle_t uartQueue;
@@ -53,7 +45,7 @@ void varsManager(void *parameter) // Funcionamiento comprobado
         dataVars.corrData[2] = sensCorr3.readCurrentACS712();
         dataVars.corrData[3] = sensCorr4.readCurrentACS712();
 
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // Delay para ejecutar otras tareas y no solaparlas
+        vTaskDelay(taskDelayValue / portTICK_PERIOD_MS); // Delay para ejecutar otras tareas y no solaparlas
     }
 }
 
@@ -66,79 +58,79 @@ void uartTransmitter(void *parameter) // Funcionamiento comprobado
         time(&now);
         localtime_r(&now, &timeinfo);
 
-        char timeString[10];
-        strftime(timeString, sizeof(timeString), "%H:%M:%S", &timeinfo);
+        strftime(dataVars.timeString, sizeof(dataVars.timeString), "%H:%M:%S", &timeinfo);
 
-        // mySerial.println(timeString); // No se lee desde el otro lado e irrumpe el formato de los datos
-        delay(100);
+        delay(delayValue);
 
         mySerial.write((uint8_t *)&dataVars, sizeof(dataVars));
-        delay(100);
+        delay(delayValue);
 
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(taskDelayValue / portTICK_PERIOD_MS);
     }
 }
 
-void uartReceiver(void *parameter)
+void uartReceiver(void *parameter) // Funcionamiento comprobado
 {
+    int data[2];
     while (1)
     {
-        if (mySerial.available())
+        if (Serial.available())
         {
-            char buffer[50];
-            size_t length = mySerial.readBytesUntil('\n', buffer, sizeof(buffer) - 1);
+            String command = Serial.readStringUntil('\n');
 
-            if (length > 0)
+            int separatorIndex = command.indexOf(',');
+
+            if (separatorIndex != -1)
             {
-                buffer[length] = '\0';
+                String pinStr = command.substring(0, separatorIndex);
+                String valueStr = command.substring(separatorIndex + 1);
 
-                Data data;
+                int pin = pinStr.toInt();
+                int value = valueStr.toInt();
 
-                // Suponemos que la cadena es del tipo "pin,estado\n"
-                if (sscanf(buffer, "%d,%d", &data.pin[0], &data.estado[0]) == 2)
+                if (pin > 0 && (value == 0 || value == 1))
                 {
-                    // Enviamos los datos a la cola
+                    data[0] = pin;
+                    data[1] = value;
+
                     if (xQueueSend(uartQueue, &data, portMAX_DELAY) != pdPASS)
                     {
-                        Serial.println("Error al enviar a la cola");
+                        // Serial.println("Error al enviar a la cola");
+                    }
+                    else
+                    {
+                        // Serial.println("Datos enviados a la cola: Pin " + String(pin) + " = " + String(value));
                     }
                 }
                 else
                 {
-                    Serial.println("Error en el formato de los datos recibidos");
+                    // Serial.println("Pin o valor no válidos.");
                 }
             }
+            else
+            {
+                // Serial.println("Formato de comando incorrecto.");
+            }
         }
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        vTaskDelay(taskDelayValue / portTICK_PERIOD_MS);
     }
 }
 
-void relayManager(void *parameter) // Funcionamiento comprobado con hardcode
+void relayManager(void *parameter) // Funcionamiento comprobado
 {
-    Data data;
-
+    int data[2];
     while (1)
     {
         if (xQueueReceive(uartQueue, &data, portMAX_DELAY) == pdPASS)
         {
-            for (int i = 0; i < 2; i++)
-            {
-                if (relays.find(data.pin[i]) != relays.end())
-                {
-                    relays[data.pin[i]].emitir(data.estado[i]);
+            int pin = data[0];
+            int value = data[1];
 
-                    Serial.print("Pin: ");
-                    Serial.print(data.pin[i]);
-                    Serial.print(" Estado: ");
-                    Serial.println(data.estado[i]);
-                }
-                else
-                {
-                    Serial.print("Pin no encontrado: ");
-                    Serial.println(data.pin[i]);
-                }
-            }
+            digital relayPin(pin);
+
+            relayPin.emitir(value);
         }
+        vTaskDelay(taskDelayValue / portTICK_PERIOD_MS);
     }
 }
 
@@ -147,7 +139,7 @@ void setup()
     Serial.begin(115200);
     mySerial.begin(9600);
 
-    uartQueue = xQueueCreate(10, sizeof(Data));
+    uartQueue = xQueueCreate(10, sizeof(int[2]));
 
     xTaskCreatePinnedToCore(varsManager, "Vars Manager", 4096, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(uartTransmitter, "UART Transmitter", 4096, NULL, 1, NULL, 0);
@@ -163,8 +155,6 @@ void loop()
 RETOQUES FINALES
 
 Variable para delay de vTask
-Comentar puntos de debug
 Definir cuantos sensores se usan
-Evaluar si conviene usar vectores estructuras a estructuras con arrays
 Variable para delay de mySerial.write
 */
