@@ -1,31 +1,30 @@
-#include "pinControl.h" // inclusion de la cabecera
+#include "pinControl.h"
 
-// El analog:: designa la clase con la que se trabajata
+analog::analog(uint8_t pin) : analogpin(pin) {}
 
-analog::analog(uint8_t analogpin)
-{ // Esta funcion tomara el pin que se ingrese y guardarlo en el atributo
-
-    this->analogpin = analogpin; // el this--> sirve para establecer la primera variable como el atributo del objeto
-}
-
-
-void analog::recep()
-{ // defino el metodo en el cual trabajara nuestra funcion
-    pinMode(analogpin, INPUT);
-    float analogval = analogRead(analogpin);
-    Serial.println(analogval);
-}
-
-digital::digital(uint8_t digitalpin)
+double analog::recep()
 {
-
-    this->digitalpin = digitalpin;
+    return analogRead(analogpin);
 }
 
+double analog::readCurrentACS712()
+{
+    const float sensitivity = 0.1; // Sensibilidad en V/A para ACS712-20A
+    const float Vref = 2.5;        // Voltaje de referencia en el punto medio
+
+    int sensorValue = analogRead(analogpin);
+    float voltage = sensorValue * (3.3 / 1023.0); // Ajustado para entrada de ESP32
+    float current = (voltage - Vref) / sensitivity;
+
+    return current;
+}
+
+digital::digital(uint8_t pin) : digitalpin(pin)
+{
+    pinMode(digitalpin, OUTPUT);
+}
 
 void digital::emitir(uint8_t digitalval)
 {
-
-    pinMode(digitalpin, OUTPUT);
     digitalWrite(digitalpin, digitalval);
 }

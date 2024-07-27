@@ -1,18 +1,18 @@
 #ifndef _PINCONTROLH_
 #define _PINCONTROLH_
 
-#include <arduino.h>
+#include <Arduino.h>
 
-class analog // se crea el objeto
+class analog
 {
-private:                // se crean atributos no modificables por el usuario, solo se utilizan dentro del objeto
-    uint8_t analogpin; // pines de los sensores
+private:
+    uint8_t analogpin;
+
 public:
-    analog(uint8_t analogpin); // funcion constructor, sirve para inicializar el objeto y establecer sus valores
-
-    void recep(); // definicion de la funcion que se utilizara, se le debe agregar los atributos entre parentesis
+    analog(uint8_t analogpin);
+    double recep();
+    double readCurrentACS712();
 };
-
 
 class digital
 {
@@ -20,8 +20,8 @@ private:
     uint8_t digitalpin;
 
 public:
+    digital() : digitalpin(0) {}
     digital(uint8_t digitalpin);
-
     void emitir(uint8_t digitalval);
 };
 
