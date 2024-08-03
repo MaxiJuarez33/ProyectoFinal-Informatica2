@@ -26,7 +26,7 @@ analog capNegras(32);
 analog sensCorr1(33);
 analog sensCorr2(25);
 analog sensCorr3(26);
-analog sensCorr4(27);
+analog sensCorr4(27); // BATERIA
 
 HardwareSerial mySerial(0);
 QueueHandle_t uartQueue;

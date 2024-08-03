@@ -13,7 +13,7 @@ double analog::readCurrentACS712()
     const float Vref = 2.5;        // Voltaje de referencia en el punto medio
 
     int sensorValue = analogRead(analogpin);
-    float voltage = sensorValue * (3.3 / 1023.0); // Ajustado para entrada de ESP32
+    float voltage = sensorValue * (3.3 / 1023.0);
     float current = (voltage - Vref) / sensitivity;
 
     return current;
