@@ -1,0 +1,9 @@
+C:/Facultad/ProyectoFinal-Informatica2/ui/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/CMakeFiles/ui.dir
+C:/Facultad/ProyectoFinal-Informatica2/ui/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+C:/Facultad/ProyectoFinal-Informatica2/ui/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+C:/Facultad/ProyectoFinal-Informatica2/ui/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
+C:/Facultad/ProyectoFinal-Informatica2/ui/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/CMakeFiles/install.dir
+C:/Facultad/ProyectoFinal-Informatica2/ui/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
+C:/Facultad/ProyectoFinal-Informatica2/ui/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
+C:/Facultad/ProyectoFinal-Informatica2/ui/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/CMakeFiles/ui_autogen_timestamp_deps.dir
+C:/Facultad/ProyectoFinal-Informatica2/ui/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/CMakeFiles/ui_autogen.dir

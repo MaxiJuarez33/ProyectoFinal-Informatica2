@@ -1,17 +1,27 @@
 #include "SerialReader.h"
 #include <iostream>
 #include <stdexcept>
+#include <windows.h>
+#include <string>
+#include <cstring>
+#include <QDebug>
+
+std::wstring SerialReader::convertToWString(const char *Array)
+{
+    size_t size = strlen(Array) + 1;
+    std::wstring wString(size, L'\0');
+    mbstowcs(&wString[0], Array, size);
+    return wString;
+}
 
 SerialReader::SerialReader(const char *portName)
-    : portName(portName), hSerial(INVALID_HANDLE_VALUE), isPortOpen(false)
 {
-    memset(&dcbSerialParams, 0, sizeof(dcbSerialParams));
-    memset(&timeouts, 0, sizeof(timeouts));
+    this->portName = convertToWString(portName);
 }
 
 SerialReader::~SerialReader()
 {
-    if (isPortOpen)
+    if (hSerial != INVALID_HANDLE_VALUE)
     {
         CloseHandle(hSerial);
     }
@@ -19,20 +29,19 @@ SerialReader::~SerialReader()
 
 bool SerialReader::openPort()
 {
-    hSerial = CreateFile(portName,
+    hSerial = CreateFile(this->portName.c_str(),
                          GENERIC_READ | GENERIC_WRITE,
                          0,
                          NULL,
                          OPEN_EXISTING,
                          FILE_ATTRIBUTE_NORMAL,
                          NULL);
-
     if (hSerial == INVALID_HANDLE_VALUE)
     {
-        throw std::runtime_error("Error al abrir el puerto serie: " + std::string(portName));
+        DWORD dwError = GetLastError();
+        qDebug() << "Error al abrir el puerto: " << dwError;
+        return false;
     }
-
-    isPortOpen = true;
     return true;
 }
 

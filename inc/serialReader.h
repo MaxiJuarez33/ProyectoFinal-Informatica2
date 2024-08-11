@@ -10,8 +10,6 @@
 
 struct SaveDataVars
 {
-    double tempData[2]; // 1 Int & 2 Ext
-    double capData[3];  // 1 Blancas & 2 Grises & 3 Negras
     double corrData[4];
     char timeString[10];
 };
@@ -29,13 +27,14 @@ public:
     void setDigitalHigh(const char *relayPin);
 
 private:
-    const char *portName;
+    std::wstring portName; // Change type to std::wstring
     HANDLE hSerial;
     DCB dcbSerialParams;
     COMMTIMEOUTS timeouts;
     bool isPortOpen;
     SaveDataVars previousData;
     bool isFirstRead = true;
+    std::wstring convertToWString(const char *charArray); // Update declaration
 };
 
-#endif
+#endif // SERIALREADER_H
