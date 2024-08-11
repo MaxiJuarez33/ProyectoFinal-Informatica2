@@ -2,11 +2,13 @@
     Para empezar, se hace bastante rustico, asumiento que se usan 4 sensores, y que se usan los pines 33, 25, 26 y 27 para los sensores de corriente.
     Se asume que estos sensores estan dedicados a un dispositivo especifico, cada uno.
     33 Heladera
-    25 Cocina
-    26 Aire acondicionado
+    25 Bomba de ague
+    26 Ventilador a exterior
+    27 Aire Acondicionado
 
-    DE PRINCIPIO, SE ASUME QUE LA BATERIA ES DE 10000 mAh
+    FALTAN PANEL SOLAR, INVERSOR y BATERIA
 
+    COMO SE AGREGARON 3 SENSORES DE CORRIENTE, SE ASUME QUE ESTOS SON PARA DISPOSITIVOS COMO TV E ILUMINACION
 
     A INVESTIGAR
     Manejar los dispositivos por json
@@ -20,13 +22,13 @@
 SaveDataVars dataStruct;
 SerialReader serialReader("COM5");
 
-const float maxConsumption = dataStruct.corrData[3] / 2;
+const float maxConsumption = dataStruct.corrData[3] / 2; // 50% de la corriente maxima
 
 class Device
 {
 private:
-    double consumption;
     int priority;
+    double batteryLevel = dataStruct.corrData[3];
     std::string deviceName;
     static std::map<std::string, char> pinMap;
     static std::map<std::string, double *> currentMap;
@@ -36,12 +38,14 @@ private:
         if (pinMap.empty() && currentMap.empty())
         {
             pinMap["heladera"] = 33;
-            pinMap["cocina"] = 25;
-            pinMap["aire acondicionado"] = 26;
+            pinMap["bombaAgua"] = 25;
+            pinMap["aireAcondicionado"] = 27;
+            pinMap["ventiladorExterior"] = 26;
 
             currentMap["heladera"] = &dataStruct.corrData[0];
-            currentMap["cocina"] = &dataStruct.corrData[1];
-            currentMap["aire acondicionado"] = &dataStruct.corrData[2];
+            currentMap["bombaAgua"] = &dataStruct.corrData[1];
+            currentMap["aireAcondionado"] = &dataStruct.corrData[2];
+            currentMap["ventiladorExterior"] = &dataStruct.corrData[3];
         }
     }
 
@@ -68,8 +72,8 @@ private:
     }
 
 public:
-    Device(double consumption, int priority, std::string deviceName)
-        : consumption(consumption), priority(priority), deviceName(deviceName)
+    Device(int priority, std::string deviceName)
+        : priority(priority), deviceName(deviceName)
     {
         initializeMaps();
     }
@@ -82,13 +86,25 @@ public:
     void activate()
     {
         char pin = pinMapped();
-        serialReader.setDigitalHigh(&pin);
+        // serialReader.setDigitalHigh(&pin);
+        std::cout << "Activando " << deviceName << std::endl;
     }
 
     void deactivate()
     {
         char pin = pinMapped();
-        serialReader.setDigitalLow(&pin);
+        // serialReader.setDigitalLow(&pin);
+        std::cout << "Desactivando " << deviceName << std::endl;
+    }
+
+    bool isPeopleHome()
+    {
+        return dataStruct.corrData[4] == 0 && dataStruct.corrData[5] == 0 && dataStruct.corrData[6] == 0;
+    }
+
+    bool canActivate()
+    {
+        return batteryLevel > 30 && isPeopleHome() /*|| se esta cargando la bateria*/;
     }
 
     bool isPriority() // SE DEBERIA AGREGAR MAS ANALISIS
@@ -101,7 +117,72 @@ public:
         {
             return true;
         }
-        return false;
+    }
+};
+
+class tempAnalyzer
+{
+private:
+    double tempInt;
+    double tempExt;
+    // double batteryLevel = dataStruct.corrData[3];
+    double batteryLevel = 100;
+    double voltage = 3.3 / 4095.0; // ADC 12 bits del esp32
+    double diffTemp;
+
+    Device aireAcondicionado;
+    Device ventiladorExterior;
+
+    void tempConverter()
+    {
+        // tempInt = ((dataStruct.tempData[0] * voltage) * 100) - 273.15; // CONVIERTE LOS mv A GRADOS CELSIUS
+        // tempExt = ((dataStruct.tempData[1] * voltage) * 100) - 273.15;
+        tempInt = 28;
+        tempExt = 26;
+    }
+
+    bool isBeetwen(double temp, double min, double max)
+    {
+        return temp > min && temp < max;
+    }
+
+    bool isColdestOutside()
+    {
+        diffTemp = tempInt - tempExt;
+        return tempInt >= 28 && tempInt > tempExt && isBeetwen(diffTemp, 1, 5);
+    }
+
+public:
+    tempAnalyzer() : aireAcondicionado(3, "aireAcondicionado"), ventiladorExterior(4, "ventiladorExterior")
+    {
+        analyze();
+    }
+
+    void analyze()
+    {
+        tempConverter();
+        if (isBeetwen(tempInt, 26, 30) && batteryLevel > 50 && !isColdestOutside())
+        {
+            aireAcondicionado.activate(); // SE ASUME QUE EL AIRE O CLIMATIZADOR DETECTA LA TEMPERATURA Y SE AJUSTA SOLO (conveniente para la trama)
+        }
+        else if (isBeetwen(tempInt, 30, 35) && aireAcondicionado.canActivate() && !isColdestOutside())
+        {
+            aireAcondicionado.activate();
+        }
+        else if (tempInt > 35 && batteryLevel > 25 && aireAcondicionado.isPeopleHome())
+        {
+            aireAcondicionado.activate();
+        }
+        else if (isColdestOutside())
+        {
+            aireAcondicionado.deactivate();
+            ventiladorExterior.activate();
+        }
+        else
+        {
+            aireAcondicionado.deactivate();
+            ventiladorExterior.deactivate();
+        }
     }
 };
 
@@ -110,15 +191,12 @@ std::map<std::string, double *> Device::currentMap;
 
 int main()
 {
-    Device heladera(150.0, 1, "heladera");
-    Device cocina(150.0, 2, "cocina");
+    // Device heladera(1, "heladera");
+    // Device bombaAgua(3, "bombaAgua");
 
-    std::cout << cocina.isPriority() << std::endl;
+    tempAnalyzer tempAnalyzer;
 
-    // if (!heladera.isActivated())
-    // {
-    //     heladera.deactivate();
-    // }
+    // std::cout << bombaAgua.isPriority() << std::endl;
 
     return 0;
 }

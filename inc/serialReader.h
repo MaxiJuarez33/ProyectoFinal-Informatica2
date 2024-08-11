@@ -12,7 +12,7 @@ struct SaveDataVars
 {
     double tempData[2]; // 1 Int & 2 Ext
     double capData[3];  // 1 Blancas & 2 Grises & 3 Negras
-    double corrData[4];
+    double corrData[7]; // SE AGREGAN 3 MAS DE FORMA TEMPORAL, ORIGINALMENTE SON 4 LOS DECLARADOS EN ESP32
     char timeString[10];
 };
 

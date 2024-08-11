@@ -1,7 +1,7 @@
 # Comandos frecuentes de git
 
 - git pull - Actualiza la version del programa en nuestro pc segun ultimo commit
-- git branch - Crear rama de trabajo
+- git branch nombreDeRama- Crear rama de trabajo
 - git branch -l - Lista de la ramas existentes
 - git checkout <Nombre de la rama> - Permite cambiar de rama
 - git status - Para ver el estado de los archivos del repo
@@ -15,7 +15,7 @@
 #### Revisar si hay updates
 
 - git fetch
-- git pull (si hay cambios dados por fetch)
+- git pull origin rama (si hay cambios dados por fetch)
 
 #### Subir nuevas updates
 
@@ -65,3 +65,4 @@
 #### Unico requisito
 
 - Carpetas con nombres correctos segun lo acordado
+- Variables, funciones, clases y esas cosas con el formato del nombre acordado
