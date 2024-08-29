@@ -1,18 +1,23 @@
+#include <iostream>
 #include "archivo.h"
 
-int main()
-{
-    Datamanager data;
+int main() {
+    Jsonmanajer jsonManager;
 
-    std::string fileName = "corriente";
-    data.addVariable("heladera", 88);
+    data aparato1 = {1, 10.5, 2.3, 1};
+    data aparato2 = {2, 20.0, 5.5, 2};
 
-    std::vector<std::string> variables = {"corrienteHeladera"};
-    std::vector<double> varValues = {88};
+    if (jsonManager.managejson("datos", "horno", aparato1)) { 
+        std::cout << "Información del aparato 1 agregada con éxito.\n";
+    } else {
+        std::cout << "Error al agregar información del aparato 1.\n";
+    }
 
-    data.managedata(fileName, variables, varValues);
-
-    system("pause");
+    if (jsonManager.managejson("datos", "microondas", aparato2)) { 
+        std::cout << "Información del aparato 2 agregada con éxito.\n";
+    } else {
+        std::cout << "Error al agregar información del aparato 2.\n";
+    }
 
     return 0;
 }

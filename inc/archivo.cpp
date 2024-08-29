@@ -1,40 +1,29 @@
 #include "archivo.h"
 
-Datamanager::Datamanager()
-{
+Jsonmanajer::Jsonmanajer() {
 }
 
-Datamanager::~Datamanager()
-{
+Jsonmanajer::~Jsonmanajer() {
 }
 
-void Datamanager::addVariable(const std::string &var, const double values)
-{
-    variables.push_back(var);
-    varValues.push_back(values);
-}
-
-void Datamanager::addDecision(const std::string &decision)
-{
-    decisions.push_back(decision);
-}
-
-int Datamanager::managedata(const std::string &filename, const std::vector<std::string> &data, const std::vector<double> &values)
-{
-    std::string formato = ".csv";
+int Jsonmanajer::managejson(const std::string &filename, const std::string &dataname, data &data) { // Aquí también referencia
+    std::string formato = ".json";
     std::string fullname = filename + formato;
-    std::ofstream archivo(fullname);
+    std::ofstream archivo(fullname, std::ios::app);
 
-    if (!archivo)
-    {
+    if (!archivo) {
         std::cout << "Error al abrir el archivo para escritura." << std::endl;
-        return 0;
-    }
-
-    for (size_t i = 0; i < data.size(); ++i)
-    {
-        archivo << data[i] << "," << values[i] << std::endl;
+        return 0;       
+    } else {
+        archivo << "{\n";
+        archivo << "  \"Nombre\": \"" << dataname << "\",\n";
+        archivo << "    \"id\": " << data.id << ",\n";
+        archivo << "    \"valormax\": " << data.valormax << ",\n";
+        archivo << "    \"valormin\": " << data.valormin << ",\n";
+        archivo << "    \"pin\": " << data.pin << "\n";
+        archivo << "},\n"; 
     }
 
     archivo.close();
+    return 1; 
 }

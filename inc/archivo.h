@@ -1,25 +1,24 @@
-#ifndef _ARCHIVOH_
-#define _ARCHIVOH_
+#ifndef ARCHIVO_H
+#define ARCHIVO_H
 
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
 
-class Datamanager
+typedef struct data
 {
-private:
-    std::vector<std::string> variables;
-    std::vector<std::string> decisions;
-    std::vector<double> varValues;
+    float id;
+    float valormax;
+    float valormin;
+    const int pin;
+} data;
 
+class Jsonmanajer {
 public:
-    Datamanager();
-    ~Datamanager();
-
-    void addVariable(const std::string &var, const double values);
-    void addDecision(const std::string &decision);
-    int managedata(const std::string &filename, const std::vector<std::string> &data, const std::vector<double> &values);
+    Jsonmanajer();
+    ~Jsonmanajer();
+    int managejson(const std::string &filename, const std::string &dataname, data &data);
 };
 
-#endif
+#endif 
+
