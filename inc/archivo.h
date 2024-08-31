@@ -11,14 +11,16 @@ typedef struct data
     float valormax;
     float valormin;
     const int pin;
+
+    data(int p) : pin(p) {}
 } data;
 
-class Jsonmanajer {
+class Jsonmanajer
+{
 public:
     Jsonmanajer();
     ~Jsonmanajer();
     int managejson(const std::string &filename, const std::string &dataname, data &data);
 };
 
-#endif 
-
+#endif
