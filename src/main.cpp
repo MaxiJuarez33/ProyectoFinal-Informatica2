@@ -12,11 +12,13 @@
 
     A INVESTIGAR
     Manejar los dispositivos por json
+    Prediccion con regresion lineal usando los datos historicos (un programa que se ejecute periodicamente)
 */
 
 #include <iostream>
 #include <map>
 #include <algorithm>
+#include <ctime>
 #include "serialReader.h"
 
 SaveDataVars dataStruct;
@@ -120,7 +122,7 @@ public:
     }
 };
 
-class tempAnalyzer
+class TempAnalyzer
 {
 private:
     double tempInt;
@@ -186,6 +188,79 @@ public:
     }
 };
 
+class EnergyManager
+{
+private:
+    double batteryLevel;
+    double maxConsumption;
+    std::map<std::string, Device *> devices;
+
+    std::map<std::string, int> daytimePriorities = {
+        {"heladera", 1},
+        {"bombaAgua", 2},
+        {"aireAcondicionado", 3},
+        {"ventiladorExterior", 4}};
+
+    std::map<std::string, int> nighttimePriorities = {
+        {"heladera", 1},
+        {"ventiladorExterior", 2},
+        {"bombaAgua", 3},
+        {"aireAcondicionado", 4}};
+
+    bool isDaytime()
+    {
+        time_t now = time(0);
+        tm *ltm = localtime(&now);
+        int hour = ltm->tm_hour;
+
+        return hour >= 6 && hour <= 20;
+    }
+
+    int getDevicePriority(std::string deviceName)
+    {
+        if (isDaytime())
+        {
+            return daytimePriorities[deviceName];
+        }
+        else
+        {
+            return nighttimePriorities[deviceName];
+        }
+    }
+
+public:
+    EnergyManager(double batteryLevel, double maxConsumption)
+        : batteryLevel(batteryLevel), maxConsumption(maxConsumption) {}
+
+    void addDevice(std::string deviceName, Device *device)
+    {
+        devices[deviceName] = device;
+    }
+
+    void manageDevices()
+    {
+        for (auto &devicePair : devices)
+        {
+            std::string deviceName = devicePair.first;
+            Device *device = devicePair.second;
+
+            int priority = getDevicePriority(deviceName);
+
+            if (batteryLevel > 50 || (batteryLevel <= 50 && priority <= 2))
+            {
+                if (device->canActivate())
+                {
+                    device->activate();
+                }
+            }
+            else
+            {
+                device->deactivate();
+            }
+        }
+    }
+};
+
 std::map<std::string, char> Device::pinMap;
 std::map<std::string, double *> Device::currentMap;
 
@@ -194,7 +269,7 @@ int main()
     // Device heladera(1, "heladera");
     // Device bombaAgua(3, "bombaAgua");
 
-    tempAnalyzer tempAnalyzer;
+    TempAnalyzer tempAnalyzer;
 
     // std::cout << bombaAgua.isPriority() << std::endl;
 
