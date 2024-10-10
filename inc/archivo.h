@@ -4,23 +4,36 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+#include <json.hpp>
 
-typedef struct data
-{
-    float id;
-    float valormax;
-    float valormin;
-    const int pin;
+using json = nlohmann::json;
 
-    data(int p) : pin(p) {}
-} data;
+struct Dispositivo {
+    int id;
+    std::string nombre;
+    std::string tipo;
+    double valorMax;
+    double valorMin;
+    int pin;
+
+
+};
 
 class Jsonmanajer
 {
+
 public:
+
     Jsonmanajer();
     ~Jsonmanajer();
-    int managejson(const std::string &filename, const std::string &dataname, data &data);
+
+    void FileManage(const std::string filename, Dispositivo &structname);
+    Dispositivo set_valores(Dispositivo &structname, int id, const std::string nombre, const std::string tipo, double valorMax, double valorMin, int pin);
+
+private:
+    std::string filename; 
+    std::vector<Dispositivo> dispositivos;
 };
 
 #endif

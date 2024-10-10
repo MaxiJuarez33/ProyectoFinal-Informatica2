@@ -1,18 +1,16 @@
-#include "archivo.h"
+#include <iostream>
+#include "Archivo.h"
 
-std::string jsonTest = "jsonTest";
-std::string device = "Heladera";
-
-int main()
-{
-    data data(18);
-
-    data.id = 33;
-    data.valormax = 10;
-    data.valormin = 0;
+int main() {
 
     Jsonmanajer jsonManager;
-    jsonManager.managejson(jsonTest, device, data);
+
+    Dispositivo dispositivo;
+
+    dispositivo = jsonManager.set_valores(dispositivo, 1, "Sensor de Temperatura", "Analogico", 100.0, 0.0, 13);
+
+    jsonManager.FileManage("dispositivo", dispositivo);
+
 
     return 0;
 }
