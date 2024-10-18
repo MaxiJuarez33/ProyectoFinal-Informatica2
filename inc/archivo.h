@@ -9,22 +9,20 @@
 
 using json = nlohmann::json;
 
-struct Dispositivo {
+struct Dispositivo
+{
     int id;
     std::string nombre;
     std::string tipo;
     double valorMax;
     double valorMin;
     int pin;
-
-
 };
 
 class Jsonmanajer
 {
 
 public:
-
     Jsonmanajer();
     ~Jsonmanajer();
 
@@ -32,7 +30,7 @@ public:
     Dispositivo set_valores(Dispositivo &structname, int id, const std::string nombre, const std::string tipo, double valorMax, double valorMin, int pin);
 
 private:
-    std::string filename; 
+    std::string filename;
     std::vector<Dispositivo> dispositivos;
 };
 

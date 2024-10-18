@@ -1,0 +1,8 @@
+{
+       "id": 3,
+       "nombre": "Sensor de Temperatura",
+       "pin": 2,
+       "tipo": "Digital",
+       "valorMax": 50.0,
+       "valorMin": -20.0
+}
