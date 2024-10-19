@@ -1,5 +1,5 @@
-#ifndef TANKCONTROLLER_H
-#define TANKCONTROLLER_H
+#ifndef TANKMANAGER_H
+#define TANKMANAGER_H
 
 class WaterTank
 {
@@ -19,6 +19,7 @@ private:
 public:
     // Constructor
     WaterTank();
+    ~WaterTank() = default;
 
     // Funciones públicas para verificar los niveles críticos
     bool isWhiteCritical();
@@ -31,5 +32,3 @@ public:
 };
 
 #endif
-
-

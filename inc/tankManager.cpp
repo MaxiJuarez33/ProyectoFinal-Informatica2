@@ -1,17 +1,19 @@
-#include "tankController.h"
+#include "tankManager.h"
 #include <iostream>
 #include <cmath>
 #include <numbers>
 
 // Constructor que inicializa los niveles y valores máximos
-WaterTank::WaterTank() 
+WaterTank::WaterTank()
     : whiteMax(75), grayBlackMax(54), whiteCriticLevel(20), whiteStopPumpLevel(10), grayBlackCriticLevel(50)
 {
-    levelMap();  // Llamada para inicializar los niveles
+    levelMap(); // Llamada para inicializar los niveles
 }
 
+WaterTank::~WaterTank() = default;
+
 // Función privada que calcula los niveles de agua a partir de los sensores
-void WaterTank::levelMap() 
+void WaterTank::levelMap()
 {
     whiteLevel = whiteMax - (dataStruct.capData[0] * std::pow(0.15, 2) * std::numbers::pi);
     grayLevel = grayBlackMax - (dataStruct.capData[1] * std::pow(0.125, 2) * std::numbers::pi);
@@ -19,28 +21,28 @@ void WaterTank::levelMap()
 }
 
 // Funciones que verifican niveles críticos
-bool WaterTank::isWhiteCritical() 
+bool WaterTank::isWhiteCritical()
 {
     return whiteLevel < whiteCriticLevel;
 }
 
-bool WaterTank::isGrayCritical() 
+bool WaterTank::isGrayCritical()
 {
     return grayLevel < grayBlackCriticLevel;
 }
 
-bool WaterTank::isBlackCritical() 
+bool WaterTank::isBlackCritical()
 {
     return blackLevel < grayBlackCriticLevel;
 }
 
-bool WaterTank::isStopPumpNeeded() 
+bool WaterTank::isStopPumpNeeded()
 {
     return whiteLevel < whiteStopPumpLevel;
 }
 
 // Función que muestra el estado de los tanques
-void WaterTank::tankStatus() 
+void WaterTank::tankStatus()
 {
     std::cout << "White Level: " << whiteLevel << std::endl;
     std::cout << "Gray Level: " << grayLevel << std::endl;
