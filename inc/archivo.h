@@ -19,19 +19,23 @@ struct Dispositivo
     int pin;
 };
 
-class Jsonmanajer
+class DeviceManager
 {
 
 public:
-    Jsonmanajer();
-    ~Jsonmanajer();
+    DeviceManager();
+    ~DeviceManager();
 
-    void FileManage(const std::string filename, Dispositivo &structname);
-    Dispositivo set_valores(Dispositivo &structname, int id, const std::string nombre, const std::string tipo, double valorMax, double valorMin, int pin);
+    void fileManage(const std::string filename, Dispositivo &structname);
+    Dispositivo setValues(Dispositivo &structname, const std::string nombre, const std::string tipo, double valorMax, double valorMin, int pin);
+    void getDevice(const std::string &nombre, int id);
 
 private:
+    std::string nombre;
+    int id;
     std::string filename;
     std::vector<Dispositivo> dispositivos;
+    int getNextId();
 };
 
 #endif

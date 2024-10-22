@@ -4,15 +4,15 @@
 int main()
 {
 
-    Jsonmanajer jsonManager;
+    DeviceManager deviceManager;
 
     Dispositivo dispositivo;
 
-    dispositivo = jsonManager.set_valores(dispositivo, 1, "Sensor de Temperatura", "Analogico", 100.0, 0.0, 13);
-    dispositivo = jsonManager.set_valores(dispositivo, 2, "Sensor de corriente", "Analogico", 1000.0, 0.0, 20);
-    dispositivo = jsonManager.set_valores(dispositivo, 3, "Sensor de Temperatura", "Digital", 50.0, -20.0, 2);
+    dispositivo = deviceManager.setValues(dispositivo, "Sensor de fantasmas", "Espiritual", 999.33, 0.0, 999);
 
-    jsonManager.FileManage("dispositivo", dispositivo);
+    deviceManager.fileManage("dispositivo", dispositivo);
+
+    deviceManager.getDevice("Sensor de fantasmas", -1);
 
     return 0;
 }
