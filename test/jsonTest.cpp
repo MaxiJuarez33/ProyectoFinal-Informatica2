@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Archivo.h"
+#include "deviceMAnager.h"
 
 int main()
 {
@@ -10,7 +10,7 @@ int main()
 
     dispositivo = deviceManager.setValues(dispositivo, "Sensor de fantasmas", "Espiritual", 999.33, 0.0, 999);
 
-    deviceManager.fileManage("dispositivo", dispositivo);
+    deviceManager.fileManage(dispositivo);
 
     deviceManager.getDevice("Sensor de fantasmas", -1);
 

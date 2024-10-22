@@ -1,5 +1,5 @@
-#ifndef ARCHIVO_H
-#define ARCHIVO_H
+#ifndef DEVICEMANAGER_H
+#define DEVICEMANAGER_H
 
 #include <iostream>
 #include <fstream>
@@ -26,7 +26,7 @@ public:
     DeviceManager();
     ~DeviceManager();
 
-    void fileManage(const std::string filename, Dispositivo &structname);
+    void fileManage(Dispositivo &structname);
     Dispositivo setValues(Dispositivo &structname, const std::string nombre, const std::string tipo, double valorMax, double valorMin, int pin);
     void getDevice(const std::string &nombre, int id);
 

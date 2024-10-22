@@ -62,5 +62,13 @@
               "tipo": "Espiritual",
               "valorMax": 999.33,
               "valorMin": 0.0
+       },
+       {
+              "id": 9,
+              "nombre": "Sensor de fantasmas",
+              "pin": 999,
+              "tipo": "Espiritual",
+              "valorMax": 999.33,
+              "valorMin": 0.0
        }
 ]

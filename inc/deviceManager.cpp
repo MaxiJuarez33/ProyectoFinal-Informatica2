@@ -1,4 +1,4 @@
-#include "Archivo.h"
+#include "deviceManager.h"
 
 DeviceManager::DeviceManager()
 {
@@ -23,7 +23,7 @@ Dispositivo DeviceManager::setValues(Dispositivo &structname, const std::string 
     return structname;
 }
 
-void DeviceManager::fileManage(const std::string filename, Dispositivo &structname)
+void DeviceManager::fileManage(Dispositivo &structname)
 {
     json data;
     data["id"] = structname.id;
