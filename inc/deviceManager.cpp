@@ -73,7 +73,7 @@ void DeviceManager::fileManage(Dispositivo &structname)
     std::cout << "Dispositivo agregado al archivo '" << archivoNombre << "' correctamente." << std::endl;
 }
 
-void DeviceManager::getDevice(const std::string &nombre, int id)
+void DeviceManager::getDevice(const std::string &keyword, int id)
 {
     std::string archivoNombre = filename + ".json";
     std::ifstream archivoLectura(archivoNombre);
@@ -106,7 +106,7 @@ void DeviceManager::getDevice(const std::string &nombre, int id)
     bool encontrado = false;
     for (const auto &dispositivo : contenidoExistente)
     {
-        if ((!nombre.empty() && dispositivo["nombre"] == nombre) || (id != -1 && dispositivo["id"] == id))
+        if ((!keyword.empty() && dispositivo["nombre"].get<std::string>().find(keyword) != std::string::npos) || (id != -1 && dispositivo["id"] == id))
         {
             std::cout << "Dispositivo encontrado:\n";
             std::cout << dispositivo.dump(4) << std::endl;

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "deviceMAnager.h"
+#include "deviceManager.h"
 
 int main()
 {
@@ -12,7 +12,7 @@ int main()
 
     deviceManager.fileManage(dispositivo);
 
-    deviceManager.getDevice("Sensor de fantasmas", -1);
+    deviceManager.getDevice("fantasmas", -1);
 
     return 0;
 }
