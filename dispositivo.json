@@ -1,0 +1,26 @@
+[
+       {
+              "id": 1,
+              "nombre": "Sensor de fantasmas",
+              "pin": 999,
+              "tipo": "Espiritual",
+              "valorMax": 999.33,
+              "valorMin": 0.0
+       },
+       {
+              "id": 2,
+              "nombre": "Sensor de fantasmas",
+              "pin": 999,
+              "tipo": "Espiritual",
+              "valorMax": 999.33,
+              "valorMin": 0.0
+       },
+       {
+              "id": 3,
+              "nombre": "Sensor de fantasmas",
+              "pin": 999,
+              "tipo": "Espiritual",
+              "valorMax": 999.33,
+              "valorMin": 0.0
+       }
+]
