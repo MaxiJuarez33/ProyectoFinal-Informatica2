@@ -20,13 +20,13 @@ struct SaveDataVars
 
 analog tempInt(36);
 analog tempExt(39);
-analog capBlancas(34);
+analog capBlancas(34); // SIMULAN ULTRASONICO
 analog capGrises(35);
 analog capNegras(32);
 analog sensCorr1(33);
 analog sensCorr2(25);
 analog sensCorr3(26);
-analog sensCorr4(27);
+analog sensCorr4(27); // BATERIA
 
 HardwareSerial mySerial(0);
 QueueHandle_t uartQueue;

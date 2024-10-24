@@ -84,7 +84,6 @@ void SerialReader::readFromPort() // FUNCIONAMIENTO COMPROBADO
 
             if (isFirstRead || memcmp(&data, &previousData, sizeof(SaveDataVars)) != 0)
             {
-                // Manejo de los datos recibidos
                 previousData = data;
                 isFirstRead = false;
             }
