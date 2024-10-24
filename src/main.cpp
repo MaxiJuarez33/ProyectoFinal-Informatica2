@@ -20,6 +20,8 @@
 #include <algorithm>
 #include <ctime>
 #include "serialReader.h"
+#include "deviceManager.h"
+#include "tankManager.h"
 
 SaveDataVars dataStruct;
 SerialReader serialReader("COM5");
