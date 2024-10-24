@@ -19,7 +19,6 @@ private:
 public:
     // Constructor
     WaterTank();
-    ~WaterTank() = default;
 
     // Funciones públicas para verificar los niveles críticos
     bool isWhiteCritical();

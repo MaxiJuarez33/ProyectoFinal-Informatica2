@@ -4,6 +4,6 @@
 int main()
 {
     WaterTank tankManager;
-    tankManager.isWhiteCritical();
+    tankManager.tankStatus();
     return 0;
 }

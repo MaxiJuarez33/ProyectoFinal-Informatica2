@@ -1,7 +1,12 @@
 #include "tankManager.h"
+#include "serialReader.h"
 #include <iostream>
 #include <cmath>
 #include <numbers>
+
+#define PI 3.14159265358979323846
+
+SaveDataVars dataStruct;
 
 // Constructor que inicializa los niveles y valores máximos
 WaterTank::WaterTank()
@@ -10,14 +15,12 @@ WaterTank::WaterTank()
     levelMap(); // Llamada para inicializar los niveles
 }
 
-WaterTank::~WaterTank() = default;
-
 // Función privada que calcula los niveles de agua a partir de los sensores
 void WaterTank::levelMap()
 {
-    whiteLevel = whiteMax - (dataStruct.capData[0] * std::pow(0.15, 2) * std::numbers::pi);
-    grayLevel = grayBlackMax - (dataStruct.capData[1] * std::pow(0.125, 2) * std::numbers::pi);
-    blackLevel = grayBlackMax - (dataStruct.capData[2] * std::pow(0.125, 2) * std::numbers::pi);
+    whiteLevel = whiteMax - (dataStruct.capData[0] * std::pow(0.15, 2) * PI);
+    grayLevel = grayBlackMax - (dataStruct.capData[1] * std::pow(0.125, 2) * PI);
+    blackLevel = grayBlackMax - (dataStruct.capData[2] * std::pow(0.125, 2) * PI);
 }
 
 // Funciones que verifican niveles críticos
