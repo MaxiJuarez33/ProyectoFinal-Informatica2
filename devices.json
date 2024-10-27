@@ -1,26 +1,98 @@
 [
        {
               "id": 1,
-              "maxValue": 2.2,
-              "minValue": 1.1,
-              "name": "sensor de fantasmas",
-              "pin": 33,
-              "type": "testo"
+              "maxValue": 100.0,
+              "minValue": -40.0,
+              "name": "temperatura interior",
+              "pin": 36,
+              "type": "sensor analogico"
        },
        {
               "id": 2,
-              "maxValue": 222.22,
-              "minValue": 112.1,
-              "name": "sensor de otaku",
-              "pin": 2,
-              "type": "agua"
+              "maxValue": 100.0,
+              "minValue": -40.0,
+              "name": "temperatura exterior",
+              "pin": 39,
+              "type": "sensor analogico"
        },
        {
               "id": 3,
-              "maxValue": 1.0,
+              "maxValue": 75.0,
               "minValue": 0.0,
-              "name": "testo",
-              "pin": 22,
-              "type": "tes"
+              "name": "tanque blanco",
+              "pin": 34,
+              "type": "sensor analogico"
+       },
+       {
+              "id": 4,
+              "maxValue": 54.0,
+              "minValue": 0.0,
+              "name": "tanque negro",
+              "pin": 32,
+              "type": "sensor analogico"
+       },
+       {
+              "id": 5,
+              "maxValue": 54.0,
+              "minValue": 0.0,
+              "name": "tanque gris",
+              "pin": 35,
+              "type": "sensor analogico"
+       },
+       {
+              "id": 6,
+              "maxValue": 110.0,
+              "minValue": 0.0,
+              "name": "sensor bateria",
+              "pin": 33,
+              "type": "sensor analogico"
+       },
+       {
+              "id": 7,
+              "maxValue": 30.0,
+              "minValue": 0.0,
+              "name": "sensor inversor",
+              "pin": 40,
+              "type": "sensor analogico"
+       },
+       {
+              "id": 8,
+              "maxValue": 11.0,
+              "minValue": 0.0,
+              "name": "sensor panel solar",
+              "pin": 41,
+              "type": "sensor analogico"
+       },
+       {
+              "id": 9,
+              "maxValue": 20.0,
+              "minValue": 0.0,
+              "name": "sensor heladera",
+              "pin": 27,
+              "type": "sensor analogico"
+       },
+       {
+              "id": 10,
+              "maxValue": 5.0,
+              "minValue": 0.0,
+              "name": "sensor bomba",
+              "pin": 27,
+              "type": "sensor analogico"
+       },
+       {
+              "id": 11,
+              "maxValue": 25.0,
+              "minValue": 0.0,
+              "name": "sensor climatizador",
+              "pin": 25,
+              "type": "sensor analogico"
+       },
+       {
+              "id": 12,
+              "maxValue": 3.0,
+              "minValue": 0.0,
+              "name": "sensor iluminacion",
+              "pin": 26,
+              "type": "sensor analogico"
        }
 ]

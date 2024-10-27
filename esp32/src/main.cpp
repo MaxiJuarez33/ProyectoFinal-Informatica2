@@ -23,10 +23,10 @@ analog tempExt(39);
 analog capBlancas(34); // SIMULAN ULTRASONICO
 analog capGrises(35);
 analog capNegras(32);
-analog sensCorr1(33);
-analog sensCorr2(25);
-analog sensCorr3(26);
-analog sensCorr4(27); // BATERIA
+analog sensCorr1(33); // Bateria
+analog sensCorr2(25); // Climatizador
+analog sensCorr3(26); // Luces
+analog sensCorr4(27); // Heladera
 
 HardwareSerial mySerial(0);
 QueueHandle_t uartQueue;
