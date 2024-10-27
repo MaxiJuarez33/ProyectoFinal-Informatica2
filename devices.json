@@ -1,0 +1,26 @@
+[
+       {
+              "id": 1,
+              "maxValue": 2.2,
+              "minValue": 1.1,
+              "name": "sensor de fantasmas",
+              "pin": 33,
+              "type": "testo"
+       },
+       {
+              "id": 2,
+              "maxValue": 222.22,
+              "minValue": 112.1,
+              "name": "sensor de otaku",
+              "pin": 2,
+              "type": "agua"
+       },
+       {
+              "id": 3,
+              "maxValue": 1.0,
+              "minValue": 0.0,
+              "name": "testo",
+              "pin": 22,
+              "type": "tes"
+       }
+]

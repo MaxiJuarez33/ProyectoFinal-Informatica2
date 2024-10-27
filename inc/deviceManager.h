@@ -12,10 +12,10 @@ using json = nlohmann::json;
 struct Dispositivo
 {
     int id;
-    std::string nombre;
-    std::string tipo;
-    double valorMax;
-    double valorMin;
+    std::string name;
+    std::string type;
+    double maxValue;
+    double minValue;
     int pin;
 };
 
@@ -27,11 +27,11 @@ public:
     ~DeviceManager();
 
     void fileManage(Dispositivo &structname);
-    Dispositivo setValues(Dispositivo &structname, const std::string nombre, const std::string tipo, double valorMax, double valorMin, int pin);
-    void getDevice(const std::string &nombre, int id);
+    Dispositivo setValues(Dispositivo &structname, const std::string name, const std::string type, double maxValue, double minValue, int pin);
+    Dispositivo getDevice(const std::string &name, int id);
 
 private:
-    std::string nombre;
+    std::string name;
     int id;
     std::string filename;
     std::vector<Dispositivo> dispositivos;
