@@ -94,5 +94,62 @@
               "name": "sensor iluminacion",
               "pin": 26,
               "type": "sensor analogico"
+       },
+       {
+              "id": 13,
+              "maxValue": 0.0,
+              "minValue": 0.0,
+              "name": "switch temperatura interior",
+              "pin": 20,
+              "type": "actuador"
+       },
+       {
+              "id": 14,
+              "maxValue": 0.0,
+              "minValue": 0.0,
+              "name": "switch temperatura exterior",
+              "pin": 21,
+              "type": "actuador"
+       },
+       {
+              "id": 15,
+              "maxValue": 0.0,
+              "minValue": 0.0,
+              "name": "switch heladera",
+              "pin": 22,
+              "type": "actuador"
+       },
+       {
+              "id": 16,
+              "maxValue": 0.0,
+              "minValue": 0.0,
+              "name": "switch bomba",
+              "pin": 23,
+              "type": "actuador"
+       },
+       {
+              "id": 17,
+              "maxValue": 0.0,
+              "minValue": 0.0,
+              "name": "switch climatizador",
+              "pin": 24,
+              "type": "actuador"
+       },
+       {
+              "id": 18,
+              "maxValue": 0.0,
+              "minValue": 0.0,
+              "name": "switch iluminacion",
+              "pin": 25,
+              "type": "actuador"
+       },
+       {
+              "id": 19,
+              "maxValue": 0.0,
+              "minValue": 0.0,
+              "name": "test",
+              "pin": 0,
+              "priority": 0,
+              "type": "test"
        }
 ]

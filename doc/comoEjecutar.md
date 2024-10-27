@@ -18,6 +18,10 @@ Comando para electricAlgorithm (en src/main)
 
 g++ -Iinc -Ilib -o ProyectoFinal src/main.cpp inc/serialReader.cpp inc/deviceManager.cpp inc/tankManager.cpp lib/json.hpp
 
+Comando para electricAlgorithm en test en src/main
+
+g++ -Iinc -Ilib -o ProyectoFinal src/main.cpp inc/serialReader.cpp inc/deviceManager.cpp inc/tankManager.cpp inc/electricManager.cpp lib/json.hpp
+
 En caso de probar los codigos para test
 
 g++ -Iinc -o ProyectoFinal test/serialReaderTest.cpp inc/serialReader.cpp

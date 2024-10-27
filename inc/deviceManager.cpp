@@ -9,7 +9,7 @@ DeviceManager::~DeviceManager()
 {
 }
 
-Dispositivo DeviceManager::setValues(Dispositivo &structname, const std::string name, const std::string type, double maxValue, double minValue, int pin)
+Dispositivo DeviceManager::setValues(Dispositivo &structname, const std::string name, const std::string type, double maxValue, double minValue, int pin, int priority)
 {
     int id = getNextId();
 
@@ -19,6 +19,7 @@ Dispositivo DeviceManager::setValues(Dispositivo &structname, const std::string 
     structname.maxValue = maxValue;
     structname.minValue = minValue;
     structname.pin = pin;
+    structname.priority = priority;
 
     return structname;
 }
@@ -32,6 +33,7 @@ void DeviceManager::fileManage(Dispositivo &structname)
     data["maxValue"] = structname.maxValue;
     data["minValue"] = structname.minValue;
     data["pin"] = structname.pin;
+    data["priority"] = structname.priority;
 
     std::string archivoNombre = filename + ".json";
 
@@ -115,6 +117,7 @@ Dispositivo DeviceManager::getDevice(const std::string &keyword, int id)
             tempDevice.maxValue = dispositivo["maxValue"];
             tempDevice.minValue = dispositivo["minValue"];
             tempDevice.pin = dispositivo["pin"];
+            tempDevice.priority = dispositivo["priority"];
             return tempDevice; // Devolver el dispositivo encontrado
         }
     }
