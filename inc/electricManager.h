@@ -2,7 +2,9 @@
 #define ELECTRICMANAGER_H
 
 #include <iostream>
+#include <map>
 #include <algorithm>
+#include <ctime>
 #include "serialReader.h"
 #include "deviceManager.h"
 #include "tankManager.h"
