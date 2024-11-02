@@ -1,24 +1,25 @@
 [
        {
               "id": 1,
-              "maxValue": 100.0,
-              "minValue": -40.0,
-              "name": "temperatura interior",
-              "pin": 36,
-              "type": "sensor analogico"
+              "maxValue": 2.2,
+              "minValue": 1.1,
+              "name": "sensor de fantasmas",
+              "pin": 33,
+              "type": "testo"
        },
        {
               "id": 2,
-              "maxValue": 100.0,
-              "minValue": -40.0,
-              "name": "temperatura exterior",
-              "pin": 39,
-              "type": "sensor analogico"
+              "maxValue": 222.22,
+              "minValue": 112.1,
+              "name": "sensor de otaku",
+              "pin": 2,
+              "type": "agua"
        },
        {
               "id": 3,
-              "maxValue": 75.0,
+              "maxValue": 1.0,
               "minValue": 0.0,
+<<<<<<< HEAD
               "name": "tanque blanco",
               "pin": 34,
               "type": "sensor analogico"
@@ -151,5 +152,10 @@
               "pin": 0,
               "priority": 0,
               "type": "test"
+=======
+              "name": "testo",
+              "pin": 22,
+              "type": "tes"
+>>>>>>> parent of 65b07a0 (Lista de dispositivos final)
        }
 ]
