@@ -20,7 +20,7 @@ public:
     Dispositivo getDeviceById(int id);
 
     bool isActivated(int id);
-    // void activate(int id);
+    // void activate(int id); // No se pueden aplicar todavia, necesito algo para administrar las corrientes en tiempo real
     // void deactivate(int id);
     // bool canActivate(int id);
     bool isPriority(int id);
