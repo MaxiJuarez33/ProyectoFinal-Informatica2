@@ -9,7 +9,7 @@ DeviceManager::~DeviceManager()
 {
 }
 
-Dispositivo DeviceManager::setValues(Dispositivo &structname, const std::string name, const std::string type, double maxValue, double minValue, int pin)
+Dispositivo DeviceManager::setValues(Dispositivo &structname, const std::string name, const std::string type, double maxValue, double minValue, int pin, int priority)
 {
     int id = getNextId();
 
@@ -19,6 +19,7 @@ Dispositivo DeviceManager::setValues(Dispositivo &structname, const std::string 
     structname.maxValue = maxValue;
     structname.minValue = minValue;
     structname.pin = pin;
+    structname.priority = priority;
 
     return structname;
 }
@@ -32,6 +33,7 @@ void DeviceManager::fileManage(Dispositivo &structname)
     data["maxValue"] = structname.maxValue;
     data["minValue"] = structname.minValue;
     data["pin"] = structname.pin;
+    data["priority"] = structname.priority;
 
     std::string archivoNombre = filename + ".json";
 
@@ -99,27 +101,39 @@ Dispositivo DeviceManager::getDevice(const std::string &keyword, int id)
 
     if (!contenidoExistente.is_array())
     {
-        std::cerr << "El archivo JSON no contiene una lista de dispositivos valida." << std::endl;
+        std::cerr << "El archivo JSON no contiene una lista de dispositivos válida." << std::endl;
         return {};
     }
 
     for (const auto &dispositivo : contenidoExistente)
     {
-        if ((!keyword.empty() && dispositivo["name"].get<std::string>().find(keyword) != std::string::npos) ||
-            (id != -1 && dispositivo["id"] == id))
+        // Verificar si la clave "id" o "name" existen antes de acceder
+        if ((!keyword.empty() && dispositivo.contains("name") && dispositivo["name"].get<std::string>().find(keyword) != std::string::npos) ||
+            (id != -1 && dispositivo.contains("id") && dispositivo["id"] == id))
         {
             Dispositivo tempDevice;
-            tempDevice.id = dispositivo["id"];
-            tempDevice.name = dispositivo["name"];
-            tempDevice.type = dispositivo["type"];
-            tempDevice.maxValue = dispositivo["maxValue"];
-            tempDevice.minValue = dispositivo["minValue"];
-            tempDevice.pin = dispositivo["pin"];
+
+            // Solo asignar valores si las claves existen
+            if (dispositivo.contains("id"))
+                tempDevice.id = dispositivo["id"];
+            if (dispositivo.contains("name"))
+                tempDevice.name = dispositivo["name"];
+            if (dispositivo.contains("type"))
+                tempDevice.type = dispositivo["type"];
+            if (dispositivo.contains("maxValue"))
+                tempDevice.maxValue = dispositivo["maxValue"];
+            if (dispositivo.contains("minValue"))
+                tempDevice.minValue = dispositivo["minValue"];
+            if (dispositivo.contains("pin"))
+                tempDevice.pin = dispositivo["pin"];
+            if (dispositivo.contains("priority"))
+                tempDevice.priority = dispositivo["priority"];
+
             return tempDevice; // Devolver el dispositivo encontrado
         }
     }
 
-    std::cerr << "No se encontro ningun dispositivo con los criterios proporcionados." << std::endl;
+    std::cerr << "No se encontró ningún dispositivo con los criterios proporcionados." << std::endl;
     return {};
 }
 
