@@ -9,7 +9,7 @@ DeviceManager::~DeviceManager()
 {
 }
 
-Dispositivo DeviceManager::setValues(Dispositivo &structname, const std::string name, const std::string type, double maxValue, double minValue, int pin, int priority)
+Dispositivo DeviceManager::setValues(Dispositivo &structname, const std::string name, const std::string type, double maxValue, double minValue, int pin, int priority, bool active)
 {
     int id = getNextId();
 
@@ -20,6 +20,7 @@ Dispositivo DeviceManager::setValues(Dispositivo &structname, const std::string 
     structname.minValue = minValue;
     structname.pin = pin;
     structname.priority = priority;
+    structname.active = active;
 
     return structname;
 }
@@ -34,6 +35,7 @@ void DeviceManager::fileManage(Dispositivo &structname)
     data["minValue"] = structname.minValue;
     data["pin"] = structname.pin;
     data["priority"] = structname.priority;
+    data["active"] = structname.active;
 
     std::string archivoNombre = filename + ".json";
 
@@ -49,7 +51,7 @@ void DeviceManager::fileManage(Dispositivo &structname)
         catch (json::parse_error &e)
         {
             std::cerr << "Error al parsear el archivo JSON: " << e.what() << std::endl;
-            contenidoExistente = json::array(); // Si falla el parseo, inicializar un array vacío
+            contenidoExistente = json::array();
         }
         archivoLectura.close();
     }
@@ -107,13 +109,11 @@ Dispositivo DeviceManager::getDevice(const std::string &keyword, int id)
 
     for (const auto &dispositivo : contenidoExistente)
     {
-        // Verificar si la clave "id" o "name" existen antes de acceder
         if ((!keyword.empty() && dispositivo.contains("name") && dispositivo["name"].get<std::string>().find(keyword) != std::string::npos) ||
             (id != -1 && dispositivo.contains("id") && dispositivo["id"] == id))
         {
             Dispositivo tempDevice;
 
-            // Solo asignar valores si las claves existen
             if (dispositivo.contains("id"))
                 tempDevice.id = dispositivo["id"];
             if (dispositivo.contains("name"))
@@ -128,8 +128,10 @@ Dispositivo DeviceManager::getDevice(const std::string &keyword, int id)
                 tempDevice.pin = dispositivo["pin"];
             if (dispositivo.contains("priority"))
                 tempDevice.priority = dispositivo["priority"];
+            if (dispositivo.contains("active"))
+                tempDevice.active = dispositivo["active"];
 
-            return tempDevice; // Devolver el dispositivo encontrado
+            return tempDevice;
         }
     }
 
@@ -154,7 +156,7 @@ int DeviceManager::getNextId()
         catch (json::parse_error &e)
         {
             std::cerr << "Error al parsear el archivo JSON: " << e.what() << std::endl;
-            return 1; // Si no se puede leer el archivo, empezamos con ID 1
+            return 1;
         }
 
         archivoLectura.close();
@@ -173,4 +175,63 @@ int DeviceManager::getNextId()
     }
 
     return maxId + 1;
+}
+
+void DeviceManager::updateDevice(const Dispositivo &structname)
+{
+    std::string archivoNombre = filename + ".json";
+    std::ifstream archivoLectura(archivoNombre);
+    json contenidoExistente;
+
+    if (!archivoLectura.is_open())
+    {
+        std::cerr << "Error al abrir el archivo: " << archivoNombre << std::endl;
+        return;
+    }
+
+    try
+    {
+        archivoLectura >> contenidoExistente;
+    }
+    catch (json::parse_error &e)
+    {
+        std::cerr << "Error al parsear el archivo JSON: " << e.what() << std::endl;
+        return;
+    }
+
+    archivoLectura.close();
+
+    if (!contenidoExistente.is_array())
+    {
+        std::cerr << "El archivo JSON no contiene una lista de dispositivos válida." << std::endl;
+        return;
+    }
+
+    // Buscar el dispositivo y actualizarlo
+    for (auto &dispositivo : contenidoExistente)
+    {
+        if (dispositivo["id"] == structname.id)
+        {
+            dispositivo["name"] = structname.name;
+            dispositivo["type"] = structname.type;
+            dispositivo["maxValue"] = structname.maxValue;
+            dispositivo["minValue"] = structname.minValue;
+            dispositivo["pin"] = structname.pin;
+            dispositivo["priority"] = structname.priority;
+            dispositivo["active"] = structname.active;
+        }
+    }
+
+    // Guardar los cambios en el archivo
+    std::ofstream archivoEscritura(archivoNombre);
+    if (!archivoEscritura.is_open())
+    {
+        std::cerr << "Error al abrir el archivo: " << archivoNombre << std::endl;
+        return;
+    }
+
+    archivoEscritura << contenidoExistente.dump(7);
+    archivoEscritura.close();
+
+    std::cout << "Dispositivo con ID " << structname.id << " actualizado correctamente." << std::endl;
 }

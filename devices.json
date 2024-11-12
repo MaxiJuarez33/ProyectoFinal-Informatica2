@@ -56,11 +56,13 @@
               "type": "sensor analogico"
        },
        {
+              "active": true,
               "id": 8,
               "maxValue": 11.0,
               "minValue": 0.0,
               "name": "sensor panel solar",
               "pin": 41,
+              "priority": 0,
               "type": "sensor analogico"
        },
        {

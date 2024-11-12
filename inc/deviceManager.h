@@ -18,6 +18,7 @@ struct Dispositivo
     double minValue;
     int pin;
     int priority;
+    bool active;
 };
 
 class DeviceManager
@@ -28,8 +29,9 @@ public:
     ~DeviceManager();
 
     void fileManage(Dispositivo &structname);
-    Dispositivo setValues(Dispositivo &structname, const std::string name, const std::string type, double maxValue, double minValue, int pin, int priority);
+    Dispositivo setValues(Dispositivo &structname, const std::string name, const std::string type, double maxValue, double minValue, int pin, int priority, bool active);
     Dispositivo getDevice(const std::string &name, int id);
+    void updateDevice(const Dispositivo &structname);
 
 private:
     std::string name;

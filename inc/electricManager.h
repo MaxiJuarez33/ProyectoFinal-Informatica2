@@ -9,13 +9,21 @@ extern Dispositivo deviceStruct;
 
 class Device
 {
+private:
+    const int priorityThreshold = 3; // Max es 5
 public:
     Device();
     ~Device();
 
-    void saveDevice(const std::string name, const std::string type, double maxValue, double minValue, int pin, int priority);
+    void saveDevice(const std::string name, const std::string type, double maxValue, double minValue, int pin, int priority, bool active);
 
     Dispositivo getDeviceById(int id);
+
+    bool isActivated(int id);
+    // void activate(int id);
+    // void deactivate(int id);
+    // bool canActivate(int id);
+    bool isPriority(int id);
 };
 
 #endif
