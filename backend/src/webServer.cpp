@@ -1,8 +1,8 @@
 #include "crow.h"
-#include "deviceManager.h"
-#include "tankManager.h"
-#include "electricManager.h"
-#include "serialReader.h"
+#include "../inc/deviceManager.h"
+#include "../inc/tankManager.h"
+#include "../inc/electricManager.h"
+#include "../inc/serialReader.h"
 #include <json.hpp>
 
 // Variables globales (ya las tienes)
@@ -351,24 +351,22 @@ int main()
         
         return crow::response(200, response.dump()); });
 
-    // ===== SERVIR ARCHIVOS ESTÁTICOS =====
-
-    // Servir el frontend desde carpeta 'web'
+    // ===== SERVIR ARCHIVOS ESTÁTICOS =====    // Servir el frontend desde carpeta 'web'
     CROW_ROUTE(app, "/")
     ([](const crow::request &req)
-     { return crow::load_text("web/index.html"); });
+     { 
+        crow::response res(200);
+        res.set_header("Content-Type", "text/html");
+        res.write("<!DOCTYPE html><html><head><title>IoT Dashboard</title></head><body><h1>IoT Dashboard Backend</h1><p>API running on port 8080</p></body></html>");
+        return res; });
 
     // CORS para desarrollo
     CROW_ROUTE(app, "/api/<path>").methods("OPTIONS"_method)([](const crow::request &req, const std::string &path)
                                                              {
         crow::response res(200);
         res.add_header("Access-Control-Allow-Origin", "*");
-        res.add_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        res.add_header("Access-Control-Allow-Headers", "Content-Type");
+        res.add_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");        res.add_header("Access-Control-Allow-Headers", "Content-Type");
         return res; });
-
-    // Configurar CORS para todas las respuestas
-    app.get_middleware<crow::CORSHandler>().global().headers("Content-Type", "Authorization").methods("GET"_method, "POST"_method, "PUT"_method, "DELETE"_method).origin("*");
 
     std::cout << "🌐 Servidor web iniciado en http://localhost:8080" << std::endl;
     std::cout << "📊 Dashboard disponible en http://localhost:8080" << std::endl;

@@ -27,8 +27,8 @@ public:
     void startReading();
     void setDigitalLow(const char *relayPin);
     void setDigitalHigh(const char *relayPin);
+    SaveDataVars readSensorData();
 
-private:
     const char *portName;
     HANDLE hSerial;
     DCB dcbSerialParams;

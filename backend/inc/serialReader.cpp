@@ -128,3 +128,20 @@ void SerialReader::setDigitalHigh(const char *relayPin)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
+
+SaveDataVars SerialReader::readSensorData()
+{
+    SaveDataVars data;
+    DWORD bytesRead;
+
+    if (ReadFile(hSerial, &data, sizeof(data), &bytesRead, NULL))
+    {
+        if (bytesRead == sizeof(data))
+        {
+            return data;
+        }
+    }
+
+    // Return previous data if read fails
+    return previousData;
+}

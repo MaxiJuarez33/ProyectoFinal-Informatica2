@@ -1,29 +1,85 @@
 ---
 import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { getSensors, checkApiConnection, demoData } from '../utils/api.js';
 
-// Datos de ejemplo para sensores
-const sensorsData = {
-  temperature: [
-    { id: 'TEMP001', name: 'Temperatura Interior', value: 22.5, unit: '°C', status: 'normal', location: 'Sala Principal' },
-    { id: 'TEMP002', name: 'Temperatura Exterior', value: 18.2, unit: '°C', status: 'normal', location: 'Exterior' },
-    { id: 'TEMP003', name: 'Temperatura Tanque', value: 19.8, unit: '°C', status: 'normal', location: 'Sector A' }
-  ],
-  level: [
-    { id: 'WS001', name: 'Sensor Tanque Blanco', value: 75, unit: '%', status: 'normal', location: 'Tanque Blanco' },
-    { id: 'GS001', name: 'Sensor Tanque Gris', value: 45, unit: '%', status: 'normal', location: 'Tanque Gris' },
-    { id: 'BS001', name: 'Sensor Tanque Negro', value: 30, unit: '%', status: 'warning', location: 'Tanque Negro' }
-  ],
-  current: [
-    { id: 'CURR001', name: 'Corriente Batería', value: 12.4, unit: 'A', status: 'normal', location: 'Sistema Principal' },
-    { id: 'CURR002', name: 'Corriente Clima', value: 2.1, unit: 'A', status: 'normal', location: 'Climatización' },
-    { id: 'CURR003', name: 'Corriente Luces', value: 1.5, unit: 'A', status: 'normal', location: 'Iluminación' },
-    { id: 'CURR004', name: 'Corriente Heladera', value: 3.2, unit: 'A', status: 'normal', location: 'Refrigeración' }
-  ],
-  voltage: [
-    { id: 'VOLT001', name: 'Voltaje Principal', value: 12.4, unit: 'V', status: 'normal', location: 'Batería Principal' },
-    { id: 'VOLT002', name: 'Voltaje Auxiliar', value: 12.1, unit: 'V', status: 'normal', location: 'Sistema Auxiliar' }
-  ]
+// Try to fetch real sensor data from backend API
+let apiAvailable = false;
+let sensorsData = {
+  temperature: [],
+  level: [],
+  current: [],
+  voltage: []
 };
+
+try {
+  apiAvailable = await checkApiConnection();
+  
+  if (apiAvailable) {
+    const response = await getSensors();
+    const sensors = response?.data || {};
+    
+    // Transform the sensor data structure from the API
+    sensorsData = {
+      temperature: [
+        { id: 'temp_interior', name: 'Temperatura Interior', value: sensors.temperature?.interior?.value || 0, unit: sensors.temperature?.interior?.unit || '°C', status: sensors.temperature?.interior?.status || 'normal' },
+        { id: 'temp_exterior', name: 'Temperatura Exterior', value: sensors.temperature?.exterior?.value || 0, unit: sensors.temperature?.exterior?.unit || '°C', status: sensors.temperature?.exterior?.status || 'normal' }
+      ],
+      level: [],
+      current: Object.entries(sensors.electrical || {}).map(([key, data]) => ({
+        id: `current_${key}`,
+        name: `Corriente ${key.charAt(0).toUpperCase() + key.slice(1)}`,
+        value: data?.value || 0,
+        unit: data?.unit || 'A',
+        status: data?.status || 'normal'
+      })),
+      voltage: [
+        { id: 'voltage_battery', name: 'Voltaje Batería', value: sensors.electrical?.battery?.value || 0, unit: 'V', status: sensors.electrical?.battery?.status || 'normal' }
+      ]
+    };
+  } else {
+    // Use demo data fallback
+    const sensors = demoData.sensors.data;
+    sensorsData = {
+      temperature: [
+        { id: 'temp_interior', name: 'Temperatura Interior', value: sensors.temperature?.interior?.value || 0, unit: sensors.temperature?.interior?.unit || '°C', status: sensors.temperature?.interior?.status || 'normal' },
+        { id: 'temp_exterior', name: 'Temperatura Exterior', value: sensors.temperature?.exterior?.value || 0, unit: sensors.temperature?.exterior?.unit || '°C', status: sensors.temperature?.exterior?.status || 'normal' }
+      ],
+      level: [],
+      current: Object.entries(sensors.electrical || {}).filter(([key]) => key !== 'battery').map(([key, data]) => ({
+        id: `current_${key}`,
+        name: `Corriente ${key.charAt(0).toUpperCase() + key.slice(1)}`,
+        value: data?.value || 0,
+        unit: data?.unit || 'A',
+        status: data?.status || 'normal'
+      })),
+      voltage: [
+        { id: 'voltage_battery', name: 'Voltaje Batería', value: sensors.electrical?.battery?.value || 0, unit: 'V', status: sensors.electrical?.battery?.status || 'normal' }
+      ]
+    };
+  }
+} catch (error) {
+  console.error('Error fetching sensor data:', error);
+  apiAvailable = false;
+  // Use demo data fallback
+  const sensors = demoData.sensors.data;
+  sensorsData = {
+    temperature: [
+      { id: 'temp_interior', name: 'Temperatura Interior', value: sensors.temperature?.interior?.value || 0, unit: sensors.temperature?.interior?.unit || '°C', status: sensors.temperature?.interior?.status || 'normal' },
+      { id: 'temp_exterior', name: 'Temperatura Exterior', value: sensors.temperature?.exterior?.value || 0, unit: sensors.temperature?.exterior?.unit || '°C', status: sensors.temperature?.exterior?.status || 'normal' }
+    ],
+    level: [],
+    current: Object.entries(sensors.electrical || {}).filter(([key]) => key !== 'battery').map(([key, data]) => ({
+      id: `current_${key}`,
+      name: `Corriente ${key.charAt(0).toUpperCase() + key.slice(1)}`,
+      value: data?.value || 0,
+      unit: data?.unit || 'A',
+      status: data?.status || 'normal'
+    })),
+    voltage: [
+      { id: 'voltage_battery', name: 'Voltaje Batería', value: sensors.electrical?.battery?.value || 0, unit: 'V', status: sensors.electrical?.battery?.status || 'normal' }
+    ]
+  };
+}
 
 const getStatusColor = (status: string) => {
   switch (status) {

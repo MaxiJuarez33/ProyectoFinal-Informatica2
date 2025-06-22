@@ -1,42 +1,69 @@
 ---
 import DashboardLayout from '../layouts/DashboardLayout.astro';
 import MetricCard from '../components/MetricCard.astro';
+import { 
+  getSystemStatus, 
+  getDevices, 
+  getTanks, 
+  getSensors,
+  checkApiConnection,
+  demoData 
+} from '../utils/api.js';
 
-// Datos de ejemplo para demonstración
-const demoData = {
-  devices: { active: 4, total: 4, percentage: 100 },
-  tanks: {
-    white: { level: 75, critical: false },
-    gray: { level: 45, critical: false },
-    black: { level: 30, critical: false },
-    pump_status: "running"
-  },
-  sensors: {
-    temperature: { interior: 22, exterior: 18 },
-    current: { battery: 12.4, climate: 2.1, lights: 1.5, fridge: 3.2 }
-  },
-  electrical: {
-    battery_voltage: 12.4,
-    battery_status: "good",
-    total_consumption: 6.8
+// Try to fetch real data from backend API
+let apiAvailable = false;
+let systemData = demoData.status;
+let devicesData = demoData.devices;
+let tanksData = demoData.tanks;
+let sensorsData = demoData.sensors;
+
+try {
+  apiAvailable = await checkApiConnection();
+  
+  if (apiAvailable) {
+    // Fetch real data from backend
+    const [status, devices, tanks, sensors] = await Promise.all([
+      getSystemStatus(),
+      getDevices(),
+      getTanks(),
+      getSensors()
+    ]);
+    
+    systemData = status;
+    devicesData = devices;
+    tanksData = tanks;
+    sensorsData = sensors;
   }
-};
+} catch (error) {
+  console.error('Error fetching data from backend:', error);
+  apiAvailable = false;
+}
 
 const timestamp = new Date().toLocaleString('es-ES');
 ---
 
-<DashboardLayout title="Dashboard Principal">
-  <div class="p-6 space-y-6">
-      <!-- Notificación de modo demo -->
-    <div class="bg-primary-50 border-2 border-primary-300 rounded-xl p-4 shadow-card">
+<DashboardLayout title="Dashboard Principal">  <div class="p-6 space-y-6">
+      <!-- Notificación del estado de conexión -->
+    <div class={`border-2 rounded-xl p-4 shadow-card ${apiAvailable ? 'bg-green-50 border-green-300' : 'bg-primary-50 border-primary-300'}`}>
       <div class="flex items-start">
-        <svg class="w-5 h-5 text-primary-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-        </svg>
+        {apiAvailable ? (
+          <svg class="w-5 h-5 text-green-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+        ) : (
+          <svg class="w-5 h-5 text-primary-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+          </svg>
+        )}
         <div>
-          <h3 class="text-sm font-semibold text-primary-900 mb-1">Modo Demostración</h3>
-          <p class="text-sm text-primary-800">
-            Mostrando datos de ejemplo. Para conectar con el backend C++, ejecutar el servidor en puerto 8080.
+          <h3 class={`text-sm font-semibold mb-1 ${apiAvailable ? 'text-green-900' : 'text-primary-900'}`}>
+            {apiAvailable ? 'Conectado al Backend' : 'Modo Demostración'}
+          </h3>
+          <p class={`text-sm ${apiAvailable ? 'text-green-800' : 'text-primary-800'}`}>
+            {apiAvailable 
+              ? 'Mostrando datos en tiempo real del servidor C++ en puerto 8080.'
+              : 'Mostrando datos de ejemplo. Para conectar con el backend C++, asegúrate de que el servidor esté ejecutándose en puerto 8080.'
+            }
           </p>
         </div>      </div>
     </div>
@@ -53,10 +80,9 @@ const timestamp = new Date().toLocaleString('es-ES');
         </div>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">        <MetricCard
           title="Dispositivos"
-          value={`${demoData.devices.active}/${demoData.devices.total}`}
+          value={systemData.success ? `${systemData.data?.devices?.active || 0}/${systemData.data?.devices?.total || 0}` : "0/0"}
           icon="🔌"
           status="success"
           description="Todos los dispositivos operativos"
@@ -64,7 +90,7 @@ const timestamp = new Date().toLocaleString('es-ES');
         
         <MetricCard
           title="Agua Potable"
-          value={demoData.tanks.white.level}
+          value={systemData.success ? (systemData.data?.tanks?.white?.level || 0).toFixed(1) : "0"}
           unit="%"
           icon="💧"
           status="info"
@@ -73,16 +99,16 @@ const timestamp = new Date().toLocaleString('es-ES');
         
         <MetricCard
           title="Batería"
-          value={demoData.electrical.battery_voltage}
+          value={systemData.success ? (systemData.data?.electrical?.battery_voltage || 0).toFixed(1) : "0"}
           unit="V"
           icon="🔋"
-          status="success"
+          status={systemData.success && systemData.data?.electrical?.battery_status === "good" ? "success" : "warning"}
           description="Estado de la batería principal"
         />
         
         <MetricCard
           title="Temperatura"
-          value={demoData.sensors.temperature.interior}
+          value={systemData.success ? (systemData.data?.sensors?.temperature?.interior || 0).toFixed(1) : "0"}
           unit="°C"
           icon="🌡️"
           status="info"
@@ -101,24 +127,27 @@ const timestamp = new Date().toLocaleString('es-ES');
             <span class="text-sm font-semibold text-primary-800">75L / 100L</span>
           </div>
         </div>
-        
-        <div class="space-y-3">
+          <div class="space-y-3">
           <div class="flex justify-between items-center">
-            <span class="text-2xl font-bold text-primary-600">{demoData.tanks.white.level}%</span>
-            <span class="text-sm font-medium px-2 py-1 bg-success-100 text-success-800 rounded-full">
-              Normal
+            <span class="text-2xl font-bold text-primary-600">{systemData.success ? (systemData.data?.tanks?.white?.level || 0).toFixed(1) : 0}%</span>
+            <span class={`text-sm font-medium px-2 py-1 rounded-full ${
+              systemData.success && systemData.data?.tanks?.white?.critical 
+                ? 'bg-danger-100 text-danger-800 border border-danger-200' 
+                : 'bg-success-100 text-success-800 border border-success-200'
+            }`}>
+              {systemData.success && systemData.data?.tanks?.white?.critical ? 'Crítico' : 'Normal'}
             </span>
           </div>
             <div class="w-full bg-secondary-300 rounded-full h-4 border border-secondary-400">
             <div 
               class="bg-primary-600 h-4 rounded-full transition-all duration-500 border border-primary-700"
-              style={`width: ${demoData.tanks.white.level}%`}
+              style={`width: ${systemData.success ? (systemData.data?.tanks?.white?.level || 0) : 0}%`}
             ></div>
           </div>
           
           <p class="text-sm text-secondary-500">
             Capacidad suficiente para 3-4 días
-          </p>        </div>
+          </p></div>
       </div>
 
       <!-- Tanque Agua Gris -->
@@ -130,25 +159,28 @@ const timestamp = new Date().toLocaleString('es-ES');
             <span class="text-sm font-semibold text-secondary-800">24L / 54L</span>
           </div>
         </div>
-        
-        <div class="space-y-3">
+          <div class="space-y-3">
           <div class="flex justify-between items-center">
-            <span class="text-2xl font-bold text-secondary-700">{demoData.tanks.gray.level}%</span>
-            <span class="text-sm font-medium px-2 py-1 bg-success-100 text-success-800 rounded-full border border-success-200">
-              Normal
+            <span class="text-2xl font-bold text-secondary-700">{systemData.success ? (systemData.data?.tanks?.gray?.level || 0).toFixed(1) : 0}%</span>
+            <span class={`text-sm font-medium px-2 py-1 rounded-full ${
+              systemData.success && systemData.data?.tanks?.gray?.critical 
+                ? 'bg-danger-100 text-danger-800 border border-danger-200' 
+                : 'bg-success-100 text-success-800 border border-success-200'
+            }`}>
+              {systemData.success && systemData.data?.tanks?.gray?.critical ? 'Crítico' : 'Normal'}
             </span>
           </div>
           
           <div class="w-full bg-secondary-300 rounded-full h-4 border border-secondary-400">
             <div 
               class="bg-secondary-600 h-4 rounded-full transition-all duration-500 border border-secondary-700"
-              style={`width: ${demoData.tanks.gray.level}%`}
+              style={`width: ${systemData.success ? (systemData.data?.tanks?.gray?.level || 0) : 0}%`}
             ></div>
           </div>
           
           <p class="text-sm text-secondary-500">
             Espacio disponible para uso normal
-          </p>        </div>
+          </p></div>
       </div>
 
       <!-- Tanque Agua Negra -->
@@ -160,56 +192,58 @@ const timestamp = new Date().toLocaleString('es-ES');
             <span class="text-sm font-semibold text-secondary-900">16L / 54L</span>
           </div>
         </div>
-        
-        <div class="space-y-3">
+          <div class="space-y-3">
           <div class="flex justify-between items-center">
-            <span class="text-2xl font-bold text-secondary-800">{demoData.tanks.black.level}%</span>
-            <span class="text-sm font-medium px-2 py-1 bg-success-100 text-success-800 rounded-full border border-success-200">
-              Normal
+            <span class="text-2xl font-bold text-secondary-800">{systemData.success ? (systemData.data?.tanks?.black?.level || 0).toFixed(1) : 0}%</span>
+            <span class={`text-sm font-medium px-2 py-1 rounded-full ${
+              systemData.success && systemData.data?.tanks?.black?.critical 
+                ? 'bg-danger-100 text-danger-800 border border-danger-200' 
+                : 'bg-success-100 text-success-800 border border-success-200'
+            }`}>
+              {systemData.success && systemData.data?.tanks?.black?.critical ? 'Crítico' : 'Normal'}
             </span>
           </div>
           
           <div class="w-full bg-secondary-300 rounded-full h-4 border border-secondary-400">
             <div 
               class="bg-secondary-800 h-4 rounded-full transition-all duration-500 border border-secondary-900"
-              style={`width: ${demoData.tanks.black.level}%`}
+              style={`width: ${systemData.success ? (systemData.data?.tanks?.black?.level || 0) : 0}%`}
             ></div>
           </div>
           
           <p class="text-sm text-secondary-500">
             Suficiente capacidad disponible
           </p>
-        </div>      </div>
+        </div></div>
     </div>
 
     <!-- Consumo eléctrico -->
     <div class="bg-white rounded-xl shadow-card border border-secondary-200 p-6">
       <h3 class="text-lg font-bold text-secondary-900 mb-4">Consumo Eléctrico</h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="text-center p-4 bg-secondary-100 rounded-lg border border-secondary-300">
           <div class="text-2xl mb-2">❄️</div>
-          <div class="text-lg font-bold text-secondary-900">{demoData.sensors.current.climate}A</div>
+          <div class="text-lg font-bold text-secondary-900">{systemData.success ? (systemData.data?.sensors?.current?.climate || 0).toFixed(1) : 0}A</div>
           <div class="text-sm font-semibold text-secondary-700">Climatización</div>
         </div>
         
         <div class="text-center p-4 bg-secondary-100 rounded-lg border border-secondary-300">
           <div class="text-2xl mb-2">💡</div>
-          <div class="text-lg font-bold text-secondary-900">{demoData.sensors.current.lights}A</div>
+          <div class="text-lg font-bold text-secondary-900">{systemData.success ? (systemData.data?.sensors?.current?.lights || 0).toFixed(1) : 0}A</div>
           <div class="text-sm font-semibold text-secondary-700">Iluminación</div>
         </div>
         
         <div class="text-center p-4 bg-secondary-100 rounded-lg border border-secondary-300">
           <div class="text-2xl mb-2">🧊</div>
-          <div class="text-lg font-bold text-secondary-900">{demoData.sensors.current.fridge}A</div>
+          <div class="text-lg font-bold text-secondary-900">{systemData.success ? (systemData.data?.sensors?.current?.fridge || 0).toFixed(1) : 0}A</div>
           <div class="text-sm font-semibold text-secondary-700">Refrigeración</div>
         </div>
         
         <div class="text-center p-4 bg-primary-100 rounded-lg border-2 border-primary-300">
           <div class="text-2xl mb-2">⚡</div>
-          <div class="text-lg font-bold text-primary-900">{demoData.electrical.total_consumption}A</div>
+          <div class="text-lg font-bold text-primary-900">{systemData.success ? (systemData.data?.electrical?.total_consumption || 0).toFixed(1) : 0}A</div>
           <div class="text-sm font-semibold text-primary-700">Consumo Total</div>
-        </div>      </div>
+        </div></div>
     </div>
 
     <!-- Enlaces rápidos -->

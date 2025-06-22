@@ -1,77 +1,26 @@
 ---
 import DashboardLayout from '../layouts/DashboardLayout.astro';
 import DeviceCard from '../components/DeviceCard.astro';
+import { getDevices, checkApiConnection, demoData } from '../utils/api.js';
 
 // Obtener datos de dispositivos del backend
 let devices: any[] = [];
 let connectionError: string | null = null;
+let apiAvailable = false;
 
 try {
-  const response = await fetch('http://localhost:8080/api/devices');
-  if (response.ok) {
-    const result = await response.json();
-    if (result.success) {
-      devices = result.data;
-    } else {
-      connectionError = result.error || 'Error en respuesta del backend';
-    }
+  apiAvailable = await checkApiConnection();
+  
+  if (apiAvailable) {
+    const response = await getDevices();
+    devices = response?.data || [];
   } else {
-    connectionError = `HTTP ${response.status}: ${response.statusText}`;
-  }
+    connectionError = 'Backend no disponible';
+    devices = demoData.devices.data;  }
 } catch (error) {
   connectionError = error instanceof Error ? error.message : 'Error de conexión';
-  
-  // Datos de demostración
-  devices = [
-    {
-      id: 1,
-      name: "Sensor Temperatura Interior",
-      type: "sensor",
-      active: true,
-      value: 22.5,
-      unit: "°C",
-      status: "normal"
-    },
-    {
-      id: 2,
-      name: "Sensor Temperatura Exterior",
-      type: "sensor",
-      active: true,
-      value: 18.3,
-      unit: "°C",
-      status: "normal"
-    },
-    {
-      id: 3,
-      name: "Bomba de Agua",
-      type: "actuator",
-      active: true,
-      status: "running"
-    },
-    {
-      id: 4,
-      name: "Sistema Eléctrico",
-      type: "system",
-      active: true,
-      voltage: 12.4,
-      unit: "V",
-      status: "normal"
-    },
-    {
-      id: 5,
-      name: "Luces LED",
-      type: "actuator",
-      active: false,
-      status: "stopped"
-    },
-    {
-      id: 6,
-      name: "Ventilador Clima",
-      type: "actuator",
-      active: true,
-      status: "running"
-    }
-  ];
+  apiAvailable = false;
+  devices = demoData.devices.data;
 }
 ---
 

@@ -98,12 +98,11 @@ const getStatusColor = (status: string, active: boolean) => {
         device.active && device.status === 'normal' ? 'bg-green-400' :
         device.active && device.status === 'running' ? 'bg-blue-400' :
         device.active ? 'bg-yellow-400' : 'bg-gray-400'
-      }`}></span>
-      {device.active ? 
+      }`}></span>      {device.active ? 
         (device.status === 'normal' ? 'Activo' :
          device.status === 'running' ? 'En Funcionamiento' :
          device.status === 'stopped' ? 'Detenido' :
-         device.status.charAt(0).toUpperCase() + device.status.slice(1)) :
+         device.status ? device.status.charAt(0).toUpperCase() + device.status.slice(1) : 'Activo') :
         'Inactivo'
       }
     </span>
