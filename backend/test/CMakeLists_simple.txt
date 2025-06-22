@@ -1,0 +1,30 @@
+# Test Simple - Sin Dependencias Externas
+cmake_minimum_required(VERSION 3.14)
+project(ProyectoFinalTestsSimple)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Directorios de includes
+include_directories(../inc)
+include_directories(../lib)
+
+# Archivos fuente principales (sin main y sin serialReader por dependencias Windows)
+set(SOURCES
+    ../inc/deviceManager.cpp
+    ../inc/tankManager.cpp
+    ../inc/electricManager.cpp
+)
+
+# Test simple sin Google Test
+add_executable(
+    simple_tests
+    simpleTestRunner.cpp
+    simpleDeviceTest.cpp
+    ${SOURCES}
+)
+
+# Configuración para Windows
+if(WIN32)
+    target_compile_definitions(simple_tests PRIVATE WIN32_LEAN_AND_MEAN)
+endif()

@@ -1,0 +1,267 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import MetricCard from '../components/MetricCard.astro';
+
+// Datos de ejemplo para demonstración
+const demoData = {
+  devices: { active: 4, total: 4, percentage: 100 },
+  tanks: {
+    white: { level: 75, critical: false },
+    gray: { level: 45, critical: false },
+    black: { level: 30, critical: false },
+    pump_status: "running"
+  },
+  sensors: {
+    temperature: { interior: 22, exterior: 18 },
+    current: { battery: 12.4, climate: 2.1, lights: 1.5, fridge: 3.2 }
+  },
+  electrical: {
+    battery_voltage: 12.4,
+    battery_status: "good",
+    total_consumption: 6.8
+  }
+};
+
+const timestamp = new Date().toLocaleString('es-ES');
+---
+
+<DashboardLayout title="Dashboard Principal">
+  <div class="p-6 space-y-6">
+      <!-- Notificación de modo demo -->
+    <div class="bg-primary-50 border-2 border-primary-300 rounded-xl p-4 shadow-card">
+      <div class="flex items-start">
+        <svg class="w-5 h-5 text-primary-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+        </svg>
+        <div>
+          <h3 class="text-sm font-semibold text-primary-900 mb-1">Modo Demostración</h3>
+          <p class="text-sm text-primary-800">
+            Mostrando datos de ejemplo. Para conectar con el backend C++, ejecutar el servidor en puerto 8080.
+          </p>
+        </div>      </div>
+    </div>
+
+    <!-- Resumen del sistema -->
+    <div class="bg-white rounded-xl shadow-card border border-secondary-200 p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-secondary-900">Resumen del Sistema</h2>
+        <div class="flex items-center text-sm text-secondary-600 bg-secondary-50 px-3 py-2 rounded-lg border border-secondary-200">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+          </svg>
+          Actualizado: {timestamp}
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <MetricCard
+          title="Dispositivos"
+          value={`${demoData.devices.active}/${demoData.devices.total}`}
+          icon="🔌"
+          status="success"
+          description="Todos los dispositivos operativos"
+        />
+        
+        <MetricCard
+          title="Agua Potable"
+          value={demoData.tanks.white.level}
+          unit="%"
+          icon="💧"
+          status="info"
+          description="Nivel del tanque principal"
+        />
+        
+        <MetricCard
+          title="Batería"
+          value={demoData.electrical.battery_voltage}
+          unit="V"
+          icon="🔋"
+          status="success"
+          description="Estado de la batería principal"
+        />
+        
+        <MetricCard
+          title="Temperatura"
+          value={demoData.sensors.temperature.interior}
+          unit="°C"
+          icon="🌡️"
+          status="info"
+          description="Temperatura interior del RV"
+        />
+      </div>    </div>
+
+    <!-- Estado de tanques -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Tanque Agua Potable -->
+      <div class="bg-white rounded-xl shadow-card border border-secondary-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-secondary-900">Agua Potable</h3>
+          <div class="flex items-center bg-primary-50 px-3 py-1 rounded-lg border border-primary-200">
+            <div class="w-3 h-3 bg-primary-600 rounded-full mr-2"></div>
+            <span class="text-sm font-semibold text-primary-800">75L / 100L</span>
+          </div>
+        </div>
+        
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-2xl font-bold text-primary-600">{demoData.tanks.white.level}%</span>
+            <span class="text-sm font-medium px-2 py-1 bg-success-100 text-success-800 rounded-full">
+              Normal
+            </span>
+          </div>
+            <div class="w-full bg-secondary-300 rounded-full h-4 border border-secondary-400">
+            <div 
+              class="bg-primary-600 h-4 rounded-full transition-all duration-500 border border-primary-700"
+              style={`width: ${demoData.tanks.white.level}%`}
+            ></div>
+          </div>
+          
+          <p class="text-sm text-secondary-500">
+            Capacidad suficiente para 3-4 días
+          </p>        </div>
+      </div>
+
+      <!-- Tanque Agua Gris -->
+      <div class="bg-white rounded-xl shadow-card border border-secondary-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-secondary-900">Agua Gris</h3>
+          <div class="flex items-center bg-secondary-50 px-3 py-1 rounded-lg border border-secondary-300">
+            <div class="w-3 h-3 bg-secondary-600 rounded-full mr-2"></div>
+            <span class="text-sm font-semibold text-secondary-800">24L / 54L</span>
+          </div>
+        </div>
+        
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-2xl font-bold text-secondary-700">{demoData.tanks.gray.level}%</span>
+            <span class="text-sm font-medium px-2 py-1 bg-success-100 text-success-800 rounded-full border border-success-200">
+              Normal
+            </span>
+          </div>
+          
+          <div class="w-full bg-secondary-300 rounded-full h-4 border border-secondary-400">
+            <div 
+              class="bg-secondary-600 h-4 rounded-full transition-all duration-500 border border-secondary-700"
+              style={`width: ${demoData.tanks.gray.level}%`}
+            ></div>
+          </div>
+          
+          <p class="text-sm text-secondary-500">
+            Espacio disponible para uso normal
+          </p>        </div>
+      </div>
+
+      <!-- Tanque Agua Negra -->
+      <div class="bg-white rounded-xl shadow-card border border-secondary-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-secondary-900">Agua Negra</h3>
+          <div class="flex items-center bg-secondary-50 px-3 py-1 rounded-lg border border-secondary-400">
+            <div class="w-3 h-3 bg-secondary-800 rounded-full mr-2"></div>
+            <span class="text-sm font-semibold text-secondary-900">16L / 54L</span>
+          </div>
+        </div>
+        
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-2xl font-bold text-secondary-800">{demoData.tanks.black.level}%</span>
+            <span class="text-sm font-medium px-2 py-1 bg-success-100 text-success-800 rounded-full border border-success-200">
+              Normal
+            </span>
+          </div>
+          
+          <div class="w-full bg-secondary-300 rounded-full h-4 border border-secondary-400">
+            <div 
+              class="bg-secondary-800 h-4 rounded-full transition-all duration-500 border border-secondary-900"
+              style={`width: ${demoData.tanks.black.level}%`}
+            ></div>
+          </div>
+          
+          <p class="text-sm text-secondary-500">
+            Suficiente capacidad disponible
+          </p>
+        </div>      </div>
+    </div>
+
+    <!-- Consumo eléctrico -->
+    <div class="bg-white rounded-xl shadow-card border border-secondary-200 p-6">
+      <h3 class="text-lg font-bold text-secondary-900 mb-4">Consumo Eléctrico</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="text-center p-4 bg-secondary-100 rounded-lg border border-secondary-300">
+          <div class="text-2xl mb-2">❄️</div>
+          <div class="text-lg font-bold text-secondary-900">{demoData.sensors.current.climate}A</div>
+          <div class="text-sm font-semibold text-secondary-700">Climatización</div>
+        </div>
+        
+        <div class="text-center p-4 bg-secondary-100 rounded-lg border border-secondary-300">
+          <div class="text-2xl mb-2">💡</div>
+          <div class="text-lg font-bold text-secondary-900">{demoData.sensors.current.lights}A</div>
+          <div class="text-sm font-semibold text-secondary-700">Iluminación</div>
+        </div>
+        
+        <div class="text-center p-4 bg-secondary-100 rounded-lg border border-secondary-300">
+          <div class="text-2xl mb-2">🧊</div>
+          <div class="text-lg font-bold text-secondary-900">{demoData.sensors.current.fridge}A</div>
+          <div class="text-sm font-semibold text-secondary-700">Refrigeración</div>
+        </div>
+        
+        <div class="text-center p-4 bg-primary-100 rounded-lg border-2 border-primary-300">
+          <div class="text-2xl mb-2">⚡</div>
+          <div class="text-lg font-bold text-primary-900">{demoData.electrical.total_consumption}A</div>
+          <div class="text-sm font-semibold text-primary-700">Consumo Total</div>
+        </div>      </div>
+    </div>
+
+    <!-- Enlaces rápidos -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <a href="/devices" class="group block bg-white rounded-xl shadow-card border border-secondary-200 p-6 hover:shadow-card-hover hover:border-primary-300 transition-all duration-200">
+        <div class="flex items-center">
+          <div class="w-12 h-12 bg-primary-100 border border-primary-200 rounded-lg flex items-center justify-center group-hover:bg-primary-200 group-hover:border-primary-300 transition-colors">
+            <svg class="w-6 h-6 text-primary-700" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-bold text-secondary-900 group-hover:text-primary-800 transition-colors">
+              Dispositivos
+            </h3>
+            <p class="text-secondary-700 font-medium">Control y monitoreo de dispositivos</p>
+          </div>
+        </div>
+      </a>
+
+      <div class="group block bg-white rounded-xl shadow-card border border-secondary-200 p-6 opacity-75">
+        <div class="flex items-center">
+          <div class="w-12 h-12 bg-secondary-100 border border-secondary-200 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-secondary-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-bold text-secondary-900">
+              Tanques
+            </h3>
+            <p class="text-secondary-700 font-medium">Próximamente...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="group block bg-white rounded-xl shadow-card border border-secondary-200 p-6 opacity-75">
+        <div class="flex items-center">
+          <div class="w-12 h-12 bg-success-100 border border-success-200 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-success-600" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-bold text-secondary-900">
+              Sensores
+            </h3>
+            <p class="text-secondary-700 font-medium">Próximamente...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</DashboardLayout>

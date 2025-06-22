@@ -1,0 +1,380 @@
+// Ejemplo de Dashboard Principal con Astro + TypeScript
+// Archivo: web-frontend/src/pages/index.astro
+
+---
+// Código que se ejecuta en el servidor (build time)
+interface SystemData {
+  devices: { active: number; total: number };
+  tanks: { white: any; gray: any; black: any };
+  sensors: { temperature: any; current: any };
+  timestamp: string;
+}
+
+// Fetch inicial de datos del backend C++
+let systemData: SystemData | null = null;
+let error: string | null = null;
+
+try {
+  // En desarrollo, esto conectará via proxy a localhost:8080
+  const response = await fetch('http://localhost:8080/api/status');
+  if (response.ok) {
+    const result = await response.json();
+    systemData = result.data;
+  } else {
+    error = `HTTP ${response.status}: ${response.statusText}`;
+  }
+} catch (e) {
+  error = `Error de conexión: ${e.message}`;
+  // Datos de ejemplo para desarrollo sin backend
+  systemData = {
+    devices: { active: 3, total: 5 },
+    tanks: {
+      white: { level: 75, critical: false },
+      gray: { level: 45, critical: false },
+      black: { level: 30, critical: true }
+    },
+    sensors: {
+      temperature: { interior: 22.5, exterior: 18.3 },
+      current: { battery: 12.6, climate: 2.3, lights: 1.1, fridge: 4.2 }
+    },
+    timestamp: new Date().toISOString()
+  };
+}
+---
+
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard IoT - Sistema RV</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+  <div class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center">
+            <h1 class="text-2xl font-bold text-gray-900">
+              🏠 Dashboard IoT RV
+            </h1>
+            <span class="ml-4 px-2 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+              Sistema Activo
+            </span>
+          </div>
+          <div class="text-sm text-gray-500">
+            Última actualización: {systemData?.timestamp ? new Date(systemData.timestamp).toLocaleString('es-ES') : 'N/A'}
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {error && (
+        <div class="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">⚠️</div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-yellow-800">
+                Conexión con Backend
+              </h3>
+              <div class="mt-2 text-sm text-yellow-700">
+                {error}
+                <br>Mostrando datos de ejemplo para desarrollo.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <!-- Grid principal del dashboard -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        
+        <!-- Card: Dispositivos -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                <span class="text-white text-sm font-bold">🔌</span>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">
+                  Dispositivos Activos
+                </dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  {systemData?.devices.active || 0} / {systemData?.devices.total || 0}
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Tanque Agua Blanca -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                systemData?.tanks.white.critical ? 'bg-red-500' : 'bg-blue-500'
+              }`}>
+                <span class="text-white text-sm font-bold">💧</span>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">
+                  Agua Blanca
+                </dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  {systemData?.tanks.white.level || 0}%
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Temperatura -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                <span class="text-white text-sm font-bold">🌡️</span>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">
+                  Temperatura Interior
+                </dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  {systemData?.sensors.temperature.interior || 0}°C
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Batería -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                <span class="text-white text-sm font-bold">🔋</span>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">
+                  Voltaje Batería
+                </dt>
+                <dd class="text-lg font-medium text-gray-900">
+                  {systemData?.sensors.current.battery || 0}V
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de tanques detallada -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Tanque Agua Blanca -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">💧 Agua Blanca</h3>
+          <div class="relative pt-1">
+            <div class="flex mb-2 items-center justify-between">
+              <div class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                Nivel
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-semibold inline-block text-blue-600">
+                  {systemData?.tanks.white.level || 0}%
+                </span>
+              </div>
+            </div>
+            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+              <div 
+                style={`width: ${systemData?.tanks.white.level || 0}%`}
+                class={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${
+                  systemData?.tanks.white.critical ? 'bg-red-500' : 'bg-blue-500'
+                }`}>
+              </div>
+            </div>
+          </div>
+          {systemData?.tanks.white.critical && (
+            <div class="mt-2 text-sm text-red-600">⚠️ Nivel crítico</div>
+          )}
+        </div>
+
+        <!-- Tanque Agua Gris -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">🚿 Agua Gris</h3>
+          <div class="relative pt-1">
+            <div class="flex mb-2 items-center justify-between">
+              <div class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-gray-600 bg-gray-200">
+                Nivel
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-semibold inline-block text-gray-600">
+                  {systemData?.tanks.gray.level || 0}%
+                </span>
+              </div>
+            </div>
+            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
+              <div 
+                style={`width: ${systemData?.tanks.gray.level || 0}%`}
+                class={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${
+                  systemData?.tanks.gray.critical ? 'bg-red-500' : 'bg-gray-500'
+                }`}>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tanque Agua Negra -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">🚽 Agua Negra</h3>
+          <div class="relative pt-1">
+            <div class="flex mb-2 items-center justify-between">
+              <div class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-gray-700 bg-gray-300">
+                Nivel
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-semibold inline-block text-gray-700">
+                  {systemData?.tanks.black.level || 0}%
+                </span>
+              </div>
+            </div>
+            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-300">
+              <div 
+                style={`width: ${systemData?.tanks.black.level || 0}%`}
+                class={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${
+                  systemData?.tanks.black.critical ? 'bg-red-500' : 'bg-gray-700'
+                }`}>
+              </div>
+            </div>
+          </div>
+          {systemData?.tanks.black.critical && (
+            <div class="mt-2 text-sm text-red-600">⚠️ Requiere vaciado</div>
+          )}
+        </div>
+      </div>
+
+      <!-- Gráfico de sensores -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">📊 Monitoreo en Tiempo Real</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Gráfico de temperatura -->
+          <div>
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Temperatura</h4>
+            <canvas id="temperatureChart" width="400" height="200"></canvas>
+          </div>
+          <!-- Gráfico de corriente -->
+          <div>
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Consumo Eléctrico</h4>
+            <canvas id="currentChart" width="400" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de acción rápida -->
+      <div class="mt-8 flex space-x-4">
+        <button 
+          onclick="refreshData()" 
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          🔄 Actualizar Datos
+        </button>
+        <a 
+          href="/devices" 
+          class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          🔌 Controlar Dispositivos
+        </a>
+        <a 
+          href="/tanks" 
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          💧 Ver Tanques Detallado
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Configurar gráficos con Chart.js
+    const temperatureData = {
+      labels: ['Interior', 'Exterior'],
+      datasets: [{
+        label: 'Temperatura (°C)',
+        data: [
+          {systemData?.sensors.temperature.interior || 0}, 
+          {systemData?.sensors.temperature.exterior || 0}
+        ],
+        backgroundColor: ['#3B82F6', '#10B981'],
+        borderColor: ['#1D4ED8', '#059669'],
+        borderWidth: 1
+      }]
+    };
+
+    const currentData = {
+      labels: ['Batería', 'Clima', 'Luces', 'Nevera'],
+      datasets: [{
+        label: 'Consumo (A)',
+        data: [
+          {systemData?.sensors.current.battery || 0},
+          {systemData?.sensors.current.climate || 0},
+          {systemData?.sensors.current.lights || 0},
+          {systemData?.sensors.current.fridge || 0}
+        ],
+        backgroundColor: ['#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'],
+        borderWidth: 1
+      }]
+    };
+
+    // Crear gráficos
+    new Chart(document.getElementById('temperatureChart'), {
+      type: 'bar',
+      data: temperatureData,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('currentChart'), {
+      type: 'doughnut',
+      data: currentData,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+
+    // Función para actualizar datos
+    async function refreshData() {
+      try {
+        const response = await fetch('/api/status');
+        if (response.ok) {
+          location.reload(); // Recarga la página con datos frescos
+        } else {
+          alert('Error al conectar con el sistema');
+        }
+      } catch (error) {
+        alert('Error de conexión: ' + error.message);
+      }
+    }
+
+    // Auto-refresh cada 30 segundos
+    setInterval(refreshData, 30000);
+  </script>
+</body>
+</html>
