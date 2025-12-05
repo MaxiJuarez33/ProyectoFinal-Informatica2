@@ -7,9 +7,10 @@ export interface Props {
   status: 'success' | 'warning' | 'danger' | 'info';
   change?: string;
   description?: string;
+  id?: string;
 }
 
-const { title, value, unit, icon, status, change, description } = Astro.props;
+const { title, value, unit, icon, status, change, description, id } = Astro.props;
 
 const statusStyles = {
   success: 'border-success-200 bg-success-50',
@@ -40,7 +41,7 @@ const iconStyles = {
         </div>
         
         <div class="flex items-baseline space-x-2 mb-3">
-          <span class="text-3xl font-bold text-secondary-900">
+          <span id={id} class="text-3xl font-bold text-secondary-900">
             {value}
           </span>
           {unit && (
