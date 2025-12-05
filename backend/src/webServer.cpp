@@ -5,14 +5,38 @@
 #include "../inc/serialReader.h"
 #include <json.hpp>
 
-// Variables globales (ya las tienes)
+// Variables globales
 extern DeviceManager deviceManager;
-extern WaterTank tankManager;
-extern Device electricDevice;
+WaterTank tankManager;
+Device electricDevice;
 extern SaveDataVars dataStruct;
+
+// Thread para actualizar datos
+void dataUpdater(SerialReader &reader)
+{
+    while (true)
+    {
+        dataStruct = reader.readSensorData();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+}
 
 int main()
 {
+    // Inicializar SerialReader (Mock o Real)
+    SerialReader serialReader("COM3"); // Puerto dummy para el mock
+    serialReader.openPort();
+    serialReader.configurePort();
+
+    // Iniciar thread de lectura en background (el del propio reader)
+    std::thread readerThread([&serialReader]()
+                             { serialReader.readFromPort(); });
+    readerThread.detach();
+
+    // Iniciar thread para actualizar la estructura global
+    std::thread updaterThread(dataUpdater, std::ref(serialReader));
+    updaterThread.detach();
+
     crow::SimpleApp app;
 
     // ===== ENDPOINTS DE DISPOSITIVOS =====

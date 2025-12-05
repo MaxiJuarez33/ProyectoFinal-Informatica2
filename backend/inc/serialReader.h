@@ -1,7 +1,10 @@
 #ifndef SERIALREADER_H
 #define SERIALREADER_H
 
+#ifdef _WIN32
 #include <windows.h>
+#endif
+
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -30,12 +33,15 @@ public:
     SaveDataVars readSensorData();
 
     const char *portName;
-    HANDLE hSerial;
-    DCB dcbSerialParams;
-    COMMTIMEOUTS timeouts;
     bool isPortOpen;
     SaveDataVars previousData;
     bool isFirstRead = true;
+
+#ifdef _WIN32
+    HANDLE hSerial;
+    DCB dcbSerialParams;
+    COMMTIMEOUTS timeouts;
+#endif
 };
 
 #endif
