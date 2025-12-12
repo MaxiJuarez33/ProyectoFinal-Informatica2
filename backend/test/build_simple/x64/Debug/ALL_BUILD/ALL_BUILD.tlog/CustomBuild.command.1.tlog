@@ -1,0 +1,10 @@
+^C:\FACULTAD\PROYECTOFINAL-INFORMATICA2\TEST\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Facultad/ProyectoFinal-Informatica2/test -BC:/Facultad/ProyectoFinal-Informatica2/test/build_simple --check-stamp-file C:/Facultad/ProyectoFinal-Informatica2/test/build_simple/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

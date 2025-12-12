@@ -1,0 +1,376 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { getSensors, checkApiConnection, demoData } from '../utils/api.js';
+
+// Try to fetch real sensor data from backend API
+let apiAvailable = false;
+let sensorsData = {
+  temperature: [],
+  level: [],
+  current: [],
+  voltage: []
+};
+
+try {
+  apiAvailable = await checkApiConnection();
+  
+  if (apiAvailable) {
+    const response = await getSensors();
+    const sensors = response?.data || {};
+    
+    // Transform the sensor data structure from the API
+    sensorsData = {
+      temperature: [
+        { id: 'temp_interior', name: 'Temperatura Interior', value: sensors.temperature?.interior?.value || 0, unit: sensors.temperature?.interior?.unit || '°C', status: sensors.temperature?.interior?.status || 'normal' },
+        { id: 'temp_exterior', name: 'Temperatura Exterior', value: sensors.temperature?.exterior?.value || 0, unit: sensors.temperature?.exterior?.unit || '°C', status: sensors.temperature?.exterior?.status || 'normal' }
+      ],
+      level: [],
+      current: Object.entries(sensors.electrical || {}).map(([key, data]) => ({
+        id: `current_${key}`,
+        name: `Corriente ${key.charAt(0).toUpperCase() + key.slice(1)}`,
+        value: data?.value || 0,
+        unit: data?.unit || 'A',
+        status: data?.status || 'normal'
+      })),
+      voltage: [
+        { id: 'voltage_battery', name: 'Voltaje Batería', value: sensors.electrical?.battery?.value || 0, unit: 'V', status: sensors.electrical?.battery?.status || 'normal' }
+      ]
+    };
+  } else {
+    // Use demo data fallback
+    const sensors = demoData.sensors.data;
+    sensorsData = {
+      temperature: [
+        { id: 'temp_interior', name: 'Temperatura Interior', value: sensors.temperature?.interior?.value || 0, unit: sensors.temperature?.interior?.unit || '°C', status: sensors.temperature?.interior?.status || 'normal' },
+        { id: 'temp_exterior', name: 'Temperatura Exterior', value: sensors.temperature?.exterior?.value || 0, unit: sensors.temperature?.exterior?.unit || '°C', status: sensors.temperature?.exterior?.status || 'normal' }
+      ],
+      level: [],
+      current: Object.entries(sensors.electrical || {}).filter(([key]) => key !== 'battery').map(([key, data]) => ({
+        id: `current_${key}`,
+        name: `Corriente ${key.charAt(0).toUpperCase() + key.slice(1)}`,
+        value: data?.value || 0,
+        unit: data?.unit || 'A',
+        status: data?.status || 'normal'
+      })),
+      voltage: [
+        { id: 'voltage_battery', name: 'Voltaje Batería', value: sensors.electrical?.battery?.value || 0, unit: 'V', status: sensors.electrical?.battery?.status || 'normal' }
+      ]
+    };
+  }
+} catch (error) {
+  console.error('Error fetching sensor data:', error);
+  apiAvailable = false;
+  // Use demo data fallback
+  const sensors = demoData.sensors.data;
+  sensorsData = {
+    temperature: [
+      { id: 'temp_interior', name: 'Temperatura Interior', value: sensors.temperature?.interior?.value || 0, unit: sensors.temperature?.interior?.unit || '°C', status: sensors.temperature?.interior?.status || 'normal' },
+      { id: 'temp_exterior', name: 'Temperatura Exterior', value: sensors.temperature?.exterior?.value || 0, unit: sensors.temperature?.exterior?.unit || '°C', status: sensors.temperature?.exterior?.status || 'normal' }
+    ],
+    level: [],
+    current: Object.entries(sensors.electrical || {}).filter(([key]) => key !== 'battery').map(([key, data]) => ({
+      id: `current_${key}`,
+      name: `Corriente ${key.charAt(0).toUpperCase() + key.slice(1)}`,
+      value: data?.value || 0,
+      unit: data?.unit || 'A',
+      status: data?.status || 'normal'
+    })),
+    voltage: [
+      { id: 'voltage_battery', name: 'Voltaje Batería', value: sensors.electrical?.battery?.value || 0, unit: 'V', status: sensors.electrical?.battery?.status || 'normal' }
+    ]
+  };
+}
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'normal': return 'text-green-600 bg-green-100 border-green-200';
+    case 'warning': return 'text-yellow-600 bg-yellow-100 border-yellow-200';
+    case 'critical': return 'text-red-600 bg-red-100 border-red-200';
+    case 'offline': return 'text-gray-600 bg-gray-100 border-gray-200';
+    default: return 'text-gray-600 bg-gray-100 border-gray-200';
+  }
+};
+
+const getSensorIcon = (type: string) => {
+  switch (type) {
+    case 'temperature':
+      return `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>`;
+    case 'level':
+      return `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>`;
+    case 'current':
+      return `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>`;
+    case 'voltage':
+      return `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
+    default:
+      return `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z"></path>`;
+  }
+};
+
+const renderSensorCard = (sensor: any, type: string) => {
+  return `
+    <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-4 hover:shadow-xl transition-shadow duration-200">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              ${getSensorIcon(type)}
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 text-sm">${sensor.name}</h3>
+            <p class="text-xs text-gray-500 font-mono">${sensor.id}</p>
+          </div>
+        </div>
+        <span class="px-2 py-1 rounded-full text-xs font-semibold border ${getStatusColor(sensor.status)}">
+          ${sensor.status.toUpperCase()}
+        </span>
+      </div>
+      
+      <div class="mb-3">
+        <div class="text-2xl font-bold text-gray-900 mb-1">
+          ${sensor.value} <span class="text-lg text-gray-600">${sensor.unit}</span>
+        </div>
+        <p class="text-xs text-gray-500">${sensor.location}</p>
+      </div>
+      
+      <div class="flex items-center justify-between text-xs text-gray-500">
+        <span>Última lectura: hace 1 min</span>
+        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+      </div>
+    </div>
+  `;
+};
+---
+
+<DashboardLayout title="Monitoreo de Sensores">
+  <div class="space-y-6">
+    <!-- Resumen general -->
+    <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-6">
+      <h3 class="text-xl font-bold text-gray-900 mb-4">Estado General de Sensores</h3>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-green-700">Operativos</span>
+            <span class="text-2xl font-bold text-green-900">12</span>
+          </div>
+        </div>
+        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-yellow-700">Advertencias</span>
+            <span class="text-2xl font-bold text-yellow-900">1</span>
+          </div>
+        </div>
+        <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-red-700">Críticos</span>
+            <span class="text-2xl font-bold text-red-900">0</span>
+          </div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-gray-700">Offline</span>
+            <span class="text-2xl font-bold text-gray-900">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sensores de Temperatura -->
+    <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-6">
+      <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+        Sensores de Temperatura
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {sensorsData.temperature.map((sensor) => (
+          <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-4 hover:shadow-xl transition-shadow duration-200">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+                  <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-bold text-gray-900 text-sm">{sensor.name}</h4>
+                  <p class="text-xs text-gray-500 font-mono">{sensor.id}</p>
+                </div>
+              </div>
+              <span class={`px-2 py-1 rounded-full text-xs font-semibold border ${getStatusColor(sensor.status)}`}>
+                {sensor.status.toUpperCase()}
+              </span>
+            </div>
+            
+            <div class="mb-3">
+              <div class="text-2xl font-bold text-gray-900 mb-1">
+                {sensor.value} <span class="text-lg text-gray-600">{sensor.unit}</span>
+              </div>
+              <p class="text-xs text-gray-500">{sensor.location}</p>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-gray-500">
+              <span>Última lectura: hace 1 min</span>
+              <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Sensores de Nivel -->
+    <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-6">
+      <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+        </svg>
+        Sensores de Nivel
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {sensorsData.level.map((sensor) => (
+          <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-4 hover:shadow-xl transition-shadow duration-200">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-bold text-gray-900 text-sm">{sensor.name}</h4>
+                  <p class="text-xs text-gray-500 font-mono">{sensor.id}</p>
+                </div>
+              </div>
+              <span class={`px-2 py-1 rounded-full text-xs font-semibold border ${getStatusColor(sensor.status)}`}>
+                {sensor.status.toUpperCase()}
+              </span>
+            </div>
+            
+            <div class="mb-3">
+              <div class="text-2xl font-bold text-gray-900 mb-1">
+                {sensor.value} <span class="text-lg text-gray-600">{sensor.unit}</span>
+              </div>
+              <p class="text-xs text-gray-500">{sensor.location}</p>
+              <!-- Barra de progreso para sensores de nivel -->
+              <div class="mt-2">
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    class={`h-2 rounded-full transition-all duration-500 ${sensor.value >= 70 ? 'bg-green-500' : sensor.value >= 40 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                    style={`width: ${sensor.value}%`}
+                  ></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-gray-500">
+              <span>Última lectura: hace 1 min</span>
+              <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Sensores Eléctricos -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Corriente -->
+      <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Sensores de Corriente
+        </h3>
+        <div class="space-y-3">
+          {sensorsData.current.map((sensor) => (
+            <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+              <div class="flex items-center">
+                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
+                  <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900 text-sm">{sensor.name}</h4>
+                  <p class="text-xs text-gray-500">{sensor.location}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-lg font-bold text-gray-900">{sensor.value} {sensor.unit}</span>
+                <p class="text-xs text-gray-500 font-mono">{sensor.id}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Voltaje -->
+      <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Sensores de Voltaje
+        </h3>
+        <div class="space-y-3">
+          {sensorsData.voltage.map((sensor) => (
+            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+              <div class="flex items-center">
+                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900 text-sm">{sensor.name}</h4>
+                  <p class="text-xs text-gray-500">{sensor.location}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-lg font-bold text-gray-900">{sensor.value} {sensor.unit}</span>
+                <p class="text-xs text-gray-500 font-mono">{sensor.id}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertas y configuración -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Alertas activas -->
+      <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Alertas Activas</h3>
+        <div class="space-y-3">
+          <div class="flex items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+            <div class="w-2 h-2 bg-yellow-500 rounded-full mr-3"></div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">Tanque Negro: Nivel bajo (30%)</p>
+              <p class="text-xs text-gray-500">Sensor: BS001 - hace 15 min</p>
+            </div>
+          </div>
+          <div class="text-center py-4 text-gray-500 text-sm">
+            No hay alertas críticas activas
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuración -->
+      <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Configuración Rápida</h3>
+        <div class="space-y-3">
+          <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+            Calibrar Todos los Sensores
+          </button>
+          <button class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+            Exportar Datos
+          </button>
+          <button class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
+            Configurar Alertas
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>

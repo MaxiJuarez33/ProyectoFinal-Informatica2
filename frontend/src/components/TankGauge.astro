@@ -1,0 +1,142 @@
+---
+export interface Props {
+  name: string;
+  level: number;
+  capacity: number;
+  critical: boolean;
+  unit?: string;
+  color?: string;
+}
+
+const { 
+  name, 
+  level, 
+  capacity, 
+  critical, 
+  unit = 'L',
+  color = critical ? 'red' : level > 70 ? 'green' : level > 30 ? 'yellow' : 'orange'
+} = Astro.props;
+
+const percentage = Math.round((level / capacity) * 100);
+
+const colorClasses = {
+  green: 'bg-green-500',
+  yellow: 'bg-yellow-500',
+  orange: 'bg-orange-500',
+  red: 'bg-red-500',
+  blue: 'bg-blue-500',
+  gray: 'bg-gray-500'
+};
+
+const bgColorClasses = {
+  green: 'bg-green-100',
+  yellow: 'bg-yellow-100',
+  orange: 'bg-orange-100',
+  red: 'bg-red-100',
+  blue: 'bg-blue-100',
+  gray: 'bg-gray-100'
+};
+---
+
+<div class={`bg-white rounded-lg shadow-md p-6 ${critical ? 'pulse-critical border-2 border-red-500' : ''}`}>
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-lg font-semibold text-gray-900">
+      {name}
+    </h3>
+    <div class="text-right">
+      <div class="text-2xl font-bold text-gray-900">
+        {level}{unit}
+      </div>
+      <div class="text-sm text-gray-500">
+        de {capacity}{unit}
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de progreso visual del tanque -->
+  <div class="relative mb-4">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm font-medium text-gray-700">
+        Nivel: {percentage}%
+      </span>
+      {critical && (
+        <span class="text-sm font-medium text-red-600 animate-pulse">
+          ⚠️ {name.includes('Blanca') ? 'Nivel Bajo' : 'Requiere Vaciado'}
+        </span>
+      )}
+    </div>
+    
+    <!-- Barra de progreso -->
+    <div class={`w-full bg-gray-200 rounded-full h-4 ${bgColorClasses[color]}`}>
+      <div 
+        class={`h-4 rounded-full transition-all duration-500 ${colorClasses[color]} ${critical ? 'animate-pulse' : ''}`}
+        style={`width: ${percentage}%`}
+        role="progressbar"
+        aria-valuenow={percentage}
+        aria-valuemin="0"
+        aria-valuemax="100"
+      >
+      </div>
+    </div>
+    
+    <!-- Indicadores de nivel -->
+    <div class="flex justify-between text-xs text-gray-500 mt-1">
+      <span>0%</span>
+      <span>25%</span>
+      <span>50%</span>
+      <span>75%</span>
+      <span>100%</span>
+    </div>
+  </div>
+
+  <!-- Representación visual del tanque -->
+  <div class="flex justify-center">
+    <div class="relative">
+      <!-- Contenedor del tanque -->
+      <div class="w-24 h-32 border-4 border-gray-400 rounded-b-lg relative overflow-hidden bg-gray-100">
+        <!-- Líquido dentro del tanque -->
+        <div 
+          class={`absolute bottom-0 left-0 right-0 transition-all duration-1000 ${colorClasses[color]} opacity-80`}
+          style={`height: ${percentage}%`}
+        >
+        </div>
+        
+        <!-- Líneas de nivel -->
+        <div class="absolute inset-0 flex flex-col justify-between p-1">
+          <div class="h-0.5 bg-gray-400 opacity-50"></div>
+          <div class="h-0.5 bg-gray-400 opacity-50"></div>
+          <div class="h-0.5 bg-gray-400 opacity-50"></div>
+          <div class="h-0.5 bg-gray-400 opacity-50"></div>
+        </div>
+      </div>
+      
+      <!-- Etiqueta del tanque -->
+      <div class="text-center mt-2">
+        <div class="text-xs font-medium text-gray-600">
+          {name}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado y acciones -->
+  <div class="mt-4 flex justify-between items-center">
+    <div class={`px-3 py-1 rounded-full text-sm font-medium ${
+      critical ? 'bg-red-100 text-red-800' : 
+      percentage > 80 ? 'bg-green-100 text-green-800' :
+      percentage > 60 ? 'bg-yellow-100 text-yellow-800' :
+      'bg-orange-100 text-orange-800'
+    }`}>
+      {critical ? '🔴 Crítico' : 
+       percentage > 80 ? '🟢 Óptimo' :
+       percentage > 60 ? '🟡 Moderado' :
+       '🟠 Bajo'}
+    </div>
+    
+    {critical && (
+      <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+        🔧 Acción Req.
+      </button>
+    )}
+  </div>
+</div>

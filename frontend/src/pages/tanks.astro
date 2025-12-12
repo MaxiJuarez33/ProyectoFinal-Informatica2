@@ -1,0 +1,245 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import { getTanks, checkApiConnection, demoData } from '../utils/api.js';
+
+// Try to fetch real tank data from backend API
+let apiAvailable = false;
+let tanksData = { tanks: [], pump: {} };
+
+try {
+  apiAvailable = await checkApiConnection();
+  
+  if (apiAvailable) {
+    const response = await getTanks();
+    // Transform the response to array format
+    const tanks = response?.data || {};
+    tanksData = { 
+      tanks: Object.entries(tanks).map(([key, tank]) => ({
+        id: key,
+        ...tank
+      })),
+      pump: {
+        status: 'running',
+        flow_rate: 25,
+        pressure: 3.2,
+        runtime_today: 4.5
+      }
+    };
+  } else {
+    // Use demo data fallback
+    const tanks = demoData.tanks.data;
+    tanksData = { 
+      tanks: Object.entries(tanks).map(([key, tank]) => ({
+        id: key,
+        ...tank
+      })),
+      pump: {
+        status: 'running',
+        flow_rate: 25,
+        pressure: 3.2,
+        runtime_today: 4.5
+      }
+    };
+  }
+} catch (error) {
+  console.error('Error fetching tank data:', error);
+  apiAvailable = false;
+  // Use demo data fallback
+  const tanks = demoData.tanks.data;
+  tanksData = { 
+    tanks: Object.entries(tanks).map(([key, tank]) => ({
+      id: key,
+      ...tank
+    })),
+    pump: {
+      status: 'running',
+      flow_rate: 25,
+      pressure: 3.2,
+      runtime_today: 4.5
+    }
+  };
+}
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'normal': return 'text-green-600 bg-green-100';
+    case 'warning': return 'text-yellow-600 bg-yellow-100';
+    case 'critical': return 'text-red-600 bg-red-100';
+    default: return 'text-gray-600 bg-gray-100';
+  }
+};
+
+const getLevelColor = (level: number) => {
+  if (level >= 70) return 'bg-green-500';
+  if (level >= 40) return 'bg-yellow-500';
+  return 'bg-red-500';
+};
+---
+
+<DashboardLayout title="Gestión de Tanques">
+  <div class="space-y-6">
+    <!-- Estado de la bomba -->
+    <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-6">
+      <h3 class="text-xl font-bold text-gray-900 mb-4">Estado de la Bomba</h3>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-blue-700">Estado</span>
+            <div class="flex items-center">
+              <div class={`w-2 h-2 rounded-full mr-2 ${tanksData.pump.status === 'running' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+              <span class="text-lg font-bold text-blue-900 capitalize">{tanksData.pump.status}</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-indigo-700">Flujo</span>
+            <span class="text-lg font-bold text-indigo-900">{tanksData.pump.flow_rate} L/min</span>
+          </div>
+        </div>
+        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-purple-700">Presión</span>
+            <span class="text-lg font-bold text-purple-900">{tanksData.pump.pressure} bar</span>
+          </div>
+        </div>
+        <div class="bg-pink-50 p-4 rounded-lg border border-pink-200">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-pink-700">Tiempo hoy</span>
+            <span class="text-lg font-bold text-pink-900">{tanksData.pump.runtime_today}h</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tanques -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {tanksData.tanks.map((tank) => (
+        <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-gray-900">{tank.name}</h3>
+            <span class={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(tank.status)}`}>
+              {tank.status.toUpperCase()}
+            </span>
+          </div>
+          
+          <!-- Indicador de nivel circular -->
+          <div class="flex justify-center mb-6">
+            <div class="relative w-32 h-32">
+              <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 100 100">
+                <!-- Círculo de fondo -->
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="currentColor"
+                  stroke-width="8"
+                  fill="transparent"
+                  class="text-gray-200"
+                />
+                <!-- Círculo de progreso -->
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="currentColor"
+                  stroke-width="8"
+                  fill="transparent"
+                  stroke-dasharray={`${2 * Math.PI * 40}`}
+                  stroke-dashoffset={`${2 * Math.PI * 40 * (1 - tank.level / 100)}`}
+                  class={getLevelColor(tank.level).replace('bg-', 'text-')}
+                  stroke-linecap="round"
+                />
+              </svg>
+              <!-- Porcentaje en el centro -->
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span class="text-2xl font-bold text-gray-900">{tank.level}%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información del tanque -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-medium text-gray-600">Capacidad</span>
+              <span class="font-bold text-gray-900">{tank.capacity}L</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-medium text-gray-600">Volumen actual</span>
+              <span class="font-bold text-gray-900">{tank.current_volume}L</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-medium text-gray-600">Ubicación</span>
+              <span class="font-bold text-gray-900">{tank.location}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-medium text-gray-600">Sensor ID</span>
+              <span class="font-mono text-sm font-bold text-blue-600">{tank.sensor_id}</span>
+            </div>
+          </div>
+
+          <!-- Barra de progreso horizontal -->
+          <div class="mt-4">
+            <div class="flex justify-between text-xs font-medium text-gray-600 mb-1">
+              <span>0L</span>
+              <span>{tank.capacity}L</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3 shadow-inner">
+              <div 
+                class={`h-3 rounded-full transition-all duration-500 ${getLevelColor(tank.level)}`}
+                style={`width: ${tank.level}%`}
+              ></div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Historial y alertas -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Historial reciente -->
+      <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Historial Reciente</h3>
+        <div class="space-y-3">
+          <div class="flex items-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <div class="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">Bomba iniciada</p>
+              <p class="text-xs text-gray-500">hace 15 minutos</p>
+            </div>
+          </div>
+          <div class="flex items-center p-3 bg-green-50 rounded-lg border border-green-200">
+            <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">Tanque Blanco: nivel óptimo</p>
+              <p class="text-xs text-gray-500">hace 32 minutos</p>
+            </div>
+          </div>
+          <div class="flex items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+            <div class="w-2 h-2 bg-yellow-500 rounded-full mr-3"></div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">Tanque Negro: nivel bajo</p>
+              <p class="text-xs text-gray-500">hace 1 hora</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuración rápida -->
+      <div class="bg-white rounded-lg shadow-strong border border-gray-200 p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Control Manual</h3>
+        <div class="space-y-4">
+          <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
+            Iniciar Llenado Automático
+          </button>
+          <button class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
+            Parar Bomba
+          </button>
+          <button class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
+            Calibrar Sensores
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>

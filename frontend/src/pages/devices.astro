@@ -1,0 +1,374 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import DeviceCard from '../components/DeviceCard.astro';
+import { getDevices, checkApiConnection, demoData } from '../utils/api.js';
+
+// Obtener datos de dispositivos del backend
+let devices: any[] = [];
+let connectionError: string | null = null;
+let apiAvailable = false;
+
+try {
+  apiAvailable = await checkApiConnection();
+  
+  if (apiAvailable) {
+    const response = await getDevices();
+    devices = response?.data || [];
+  } else {
+    connectionError = 'Backend no disponible';
+    devices = demoData.devices.data;  }
+} catch (error) {
+  connectionError = error instanceof Error ? error.message : 'Error de conexión';
+  apiAvailable = false;
+  devices = demoData.devices.data;
+}
+---
+
+<DashboardLayout title="Control de Dispositivos - Dashboard IoT RV">
+  <!-- Encabezado de la página -->
+  <div class="mb-8">
+    <div class="md:flex md:items-center md:justify-between">
+      <div class="flex-1 min-w-0">
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          🔌 Control de Dispositivos
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">
+          Gestiona y monitorea todos los dispositivos del sistema RV
+        </p>
+      </div>
+      <div class="mt-4 flex md:mt-0 md:ml-4">
+        <button 
+          onclick="refreshDevices()" 
+          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+        >
+          🔄 Actualizar
+        </button>
+        <button 
+          onclick="toggleAllDevices()" 
+          class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+        >
+          ⚡ Control General
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Indicador de conexión -->
+  {connectionError && (
+    <div class="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-amber-800">Modo Demostración</h3>
+          <p class="mt-1 text-sm text-amber-700">
+            Backend no disponible: {connectionError}. Mostrando datos de ejemplo.
+          </p>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- Estadísticas rápidas -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white">
+            ✅
+          </div>
+        </div>
+        <div class="ml-5 w-0 flex-1">
+          <dl>
+            <dt class="text-sm font-medium text-gray-500 truncate">Activos</dt>
+            <dd class="text-lg font-medium text-gray-900">
+              {devices.filter(d => d.active).length}
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-gray-500 rounded-lg flex items-center justify-center text-white">
+            ⏸️
+          </div>
+        </div>
+        <div class="ml-5 w-0 flex-1">
+          <dl>
+            <dt class="text-sm font-medium text-gray-500 truncate">Inactivos</dt>
+            <dd class="text-lg font-medium text-gray-900">
+              {devices.filter(d => !d.active).length}
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white">
+            📡
+          </div>
+        </div>
+        <div class="ml-5 w-0 flex-1">
+          <dl>
+            <dt class="text-sm font-medium text-gray-500 truncate">Sensores</dt>
+            <dd class="text-lg font-medium text-gray-900">
+              {devices.filter(d => d.type === 'sensor').length}
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center text-white">
+            ⚙️
+          </div>
+        </div>
+        <div class="ml-5 w-0 flex-1">
+          <dl>
+            <dt class="text-sm font-medium text-gray-500 truncate">Actuadores</dt>
+            <dd class="text-lg font-medium text-gray-900">
+              {devices.filter(d => d.type === 'actuator').length}
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="mb-6">
+    <div class="bg-white rounded-lg shadow p-4">
+      <div class="flex flex-wrap gap-4">
+        <div class="flex items-center">
+          <label class="text-sm font-medium text-gray-700 mr-2">Filtrar por:</label>
+        </div>
+        <button 
+          onclick="filterDevices('all')" 
+          class="filter-btn filter-active px-3 py-1 text-sm rounded-full border"
+        >
+          Todos
+        </button>
+        <button 
+          onclick="filterDevices('sensor')" 
+          class="filter-btn px-3 py-1 text-sm rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50"
+        >
+          📡 Sensores
+        </button>
+        <button 
+          onclick="filterDevices('actuator')" 
+          class="filter-btn px-3 py-1 text-sm rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50"
+        >
+          ⚙️ Actuadores
+        </button>
+        <button 
+          onclick="filterDevices('system')" 
+          class="filter-btn px-3 py-1 text-sm rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50"
+        >
+          🔧 Sistemas
+        </button>
+        <button 
+          onclick="filterDevices('active')" 
+          class="filter-btn px-3 py-1 text-sm rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50"
+        >
+          ✅ Activos
+        </button>
+        <button 
+          onclick="filterDevices('inactive')" 
+          class="filter-btn px-3 py-1 text-sm rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50"
+        >
+          ⏸️ Inactivos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid de dispositivos -->
+  <div id="devices-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {devices.map((device) => (
+      <div class="device-card" data-type={device.type} data-active={device.active}>
+        <DeviceCard device={device} />
+      </div>
+    ))}
+  </div>
+
+  <!-- Estado vacío cuando no hay dispositivos visibles -->
+  <div id="empty-state" class="hidden text-center py-12">
+    <div class="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+      <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"></path>
+      </svg>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">No hay dispositivos</h3>
+    <p class="text-gray-500">No se encontraron dispositivos que coincidan con el filtro seleccionado.</p>
+  </div>
+
+  <!-- Modal de control general -->
+  <div id="control-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="mt-3">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Control General de Dispositivos</h3>
+        <div class="space-y-4">
+          <button 
+            onclick="controlAllDevices('activate')"
+            class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+          >
+            ✅ Activar Todos los Dispositivos
+          </button>
+          <button 
+            onclick="controlAllDevices('deactivate')"
+            class="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+          >
+            ⏸️ Desactivar Todos los Dispositivos
+          </button>
+          <button 
+            onclick="controlAllDevices('restart')"
+            class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          >
+            🔄 Reiniciar Sistema
+          </button>
+        </div>
+        <div class="mt-6 flex justify-end">
+          <button 
+            onclick="closeControlModal()"
+            class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>
+
+<script>
+  // Función para refrescar dispositivos
+  window.refreshDevices = function() {
+    console.log('🔄 Actualizando dispositivos...');
+    location.reload();
+  };
+
+  // Función para mostrar modal de control general
+  window.toggleAllDevices = function() {
+    document.getElementById('control-modal').classList.remove('hidden');
+  };
+
+  // Función para cerrar modal
+  window.closeControlModal = function() {
+    document.getElementById('control-modal').classList.add('hidden');
+  };
+
+  // Función para control masivo de dispositivos
+  window.controlAllDevices = async function(action) {
+    try {
+      // Aquí implementarías la lógica de control masivo
+      console.log(`Ejecutando acción: ${action}`);
+      
+      // Simulación de acción
+      const actions = {
+        activate: 'Activando todos los dispositivos...',
+        deactivate: 'Desactivando todos los dispositivos...',
+        restart: 'Reiniciando sistema...'
+      };
+      
+      alert(actions[action] || 'Acción desconocida');
+      closeControlModal();
+      
+      // En una implementación real, harías requests al backend
+      // await Promise.all(devices.map(device => 
+      //   fetch(`/api/devices/${device.id}/toggle`, {
+      //     method: 'POST',
+      //     body: JSON.stringify({ action })
+      //   })
+      // ));
+      
+      setTimeout(() => {
+        refreshDevices();
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error en control masivo:', error);
+      alert('Error al ejecutar la acción');
+    }
+  };
+
+  // Función para filtrar dispositivos
+  window.filterDevices = function(filter) {
+    const cards = document.querySelectorAll('.device-card');
+    const buttons = document.querySelectorAll('.filter-btn');
+    const emptyState = document.getElementById('empty-state');
+    let visibleCount = 0;
+
+    // Actualizar botones activos
+    buttons.forEach(btn => {
+      btn.classList.remove('filter-active', 'bg-blue-600', 'text-white');
+      btn.classList.add('border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
+    });
+    
+    event.target.classList.add('filter-active', 'bg-blue-600', 'text-white');
+    event.target.classList.remove('border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
+
+    // Filtrar dispositivos
+    cards.forEach(card => {
+      const type = card.dataset.type;
+      const active = card.dataset.active === 'true';
+      let show = false;
+
+      switch (filter) {
+        case 'all':
+          show = true;
+          break;
+        case 'sensor':
+        case 'actuator':
+        case 'system':
+          show = type === filter;
+          break;
+        case 'active':
+          show = active;
+          break;
+        case 'inactive':
+          show = !active;
+          break;
+      }
+
+      if (show) {
+        card.classList.remove('hidden');
+        visibleCount++;
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    // Mostrar estado vacío si no hay dispositivos visibles
+    if (visibleCount === 0) {
+      emptyState.classList.remove('hidden');
+    } else {
+      emptyState.classList.add('hidden');
+    }
+  };
+
+  // Cerrar modal al hacer click fuera
+  window.onclick = function(event) {
+    const modal = document.getElementById('control-modal');
+    if (event.target === modal) {
+      closeControlModal();
+    }
+  };
+</script>
+
+<style>
+  .filter-active {
+    @apply bg-blue-600 text-white border-blue-600;
+  }
+</style>

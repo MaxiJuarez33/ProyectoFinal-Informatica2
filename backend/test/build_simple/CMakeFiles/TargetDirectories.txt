@@ -1,0 +1,2 @@
+C:/Facultad/ProyectoFinal-Informatica2/test/build_simple/CMakeFiles/ALL_BUILD.dir
+C:/Facultad/ProyectoFinal-Informatica2/test/build_simple/CMakeFiles/ZERO_CHECK.dir

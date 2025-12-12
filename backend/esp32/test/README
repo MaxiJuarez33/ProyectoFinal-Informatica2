@@ -1,0 +1,2 @@
+
+Este programa destinado al testeo de la libreria, me permite leer valores analogicos leidos de un potenciometro, y entregar un "ALTO" o "BAJO" segun se indique en la funcion

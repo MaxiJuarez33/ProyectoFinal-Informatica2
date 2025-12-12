@@ -1,0 +1,10 @@
+^C:\FACULTAD\PROYECTOFINAL-INFORMATICA2\TEST\BUILD_SIMPLE\CMAKEFILES\EAF3662A1C54CACBE5EEAAA17FB6DB91\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Facultad/ProyectoFinal-Informatica2/test -BC:/Facultad/ProyectoFinal-Informatica2/test/build_simple --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Facultad/ProyectoFinal-Informatica2/test/build_simple/Project.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
